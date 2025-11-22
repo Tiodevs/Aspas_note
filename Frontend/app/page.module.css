@@ -1,0 +1,283 @@
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background-color: #0a0a0a;
+  color: #f5f5f5;
+  padding: 2rem clamp(1.5rem, 5vw, 4rem);
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0a0a0a;
+}
+
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #9df707;
+  animation: spin 1s linear infinite;
+}
+
+.main {
+  margin-top: clamp(2rem, 8vw, 6rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(4rem, 9vw, 6rem);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 1.75rem);
+  text-align: center;
+  margin-top: 50px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: #121212;
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  border: 1px solid #3B3B3B;
+}
+
+.title {
+  font-size: clamp(2.6rem, 7vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #f5f5f5;
+}
+
+.titleHighlight {
+  display: block;
+  color: #f5f5f5;
+}
+
+.description {
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+  color: rgba(245, 245, 245, 0.72);
+  max-width: 520px;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.9rem 1.8rem;
+  border-radius: 999px;
+  background: #9df707;
+  color: #0a0a0a;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 35px rgba(157, 247, 7, 0.22);
+}
+
+.ctaButton:active {
+  transform: translateY(0);
+}
+
+.heroGlow {
+  width: min(460px, 65vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(157, 247, 7, 0.32),
+    rgba(157, 247, 7, 0.06) 45%,
+    transparent 70%
+  );
+  filter: blur(12px);
+  justify-self: center;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 1.25rem 3rem;
+  }
+
+  .main {
+    margin-top: 3rem;
+  }
+
+  .heroGlow {
+    display: none;
+  }
+}
+
+.benefitsSection {
+  width: 100%;
+  max-width: 1024px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(2rem, 4vw, 2.75rem);
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+.sectionSubtitle {
+  max-width: 640px;
+  color: rgba(245, 245, 245, 0.72);
+  font-size: clamp(1rem, 2.4vw, 1.2rem);
+  line-height: 1.6;
+}
+
+.benefitsGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.benefitCard {
+  background: #121212;
+  border: 1px solid #2a2a2a;
+  border-radius: 18px;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.benefitCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(157, 247, 7, 0.5);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.35);
+}
+
+.benefitIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(157, 247, 7, 0.12);
+  color: #9df707;
+}
+
+.benefitCard h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #f5f5f5;
+}
+
+.benefitCard p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(245, 245, 245, 0.72);
+}
+
+.projectSection {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.75rem, 4vw, 2.5rem);
+  text-align: center;
+}
+
+.techChips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.techChip {
+  padding: 0.55rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid rgba(245, 245, 245, 0.16);
+  color: #f5f5f5;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.techChipActive {
+  border-color: #9df707;
+  color: #0a0a0a;
+  background: #9df707;
+  font-weight: 600;
+}
+
+.githubButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 1.8rem;
+  border-radius: 999px;
+  background: #9df707;
+  color: #0a0a0a;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.githubButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 35px rgba(157, 247, 7, 0.22);
+}
+
+.githubButton:active {
+  transform: translateY(0);
+}
+
+.githubButton svg {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .benefitsSection {
+    gap: 2rem;
+  }
+
+  .benefitCard {
+    padding: 1.5rem;
+  }
+
+  .techChip {
+    padding: 0.5rem 1.2rem;
+  }
+}

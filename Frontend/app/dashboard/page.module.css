@@ -1,0 +1,824 @@
+/* Dashboard Page Styles */
+.container {
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.loadingContainer {
+  width: 100%;
+  min-height: 400px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  flex-wrap: nowrap !important;
+}
+
+@media (max-width: 768px) {
+  .loadingContainer {
+    min-height: 300px;
+    border-radius: 16px;
+  }
+}
+
+/* Loading overlay que cobre toda a tela */
+.globalLoadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(249, 250, 251, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(2px);
+}
+
+.globalLoadingSpinner {
+  width: 4rem;
+  height: 4rem;
+  border: 3px solid rgba(182, 221, 27, 0.2);
+  border-top: 3px solid #b6dd1b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loadingSpinner {
+  width: 4rem;
+  height: 4rem;
+  border: 4px solid rgba(182, 221, 27, 0.2);
+  border-top: 4px solid #b6dd1b;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 4px 12px rgba(182, 221, 27, 0.3);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.main {
+  padding-top: 150px;
+  width: 800px;
+  margin: 0 auto;
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.searchInput {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #00000036;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #b6dd1b;
+}
+
+.authorSelect,
+.tagSelect {
+  padding: 12px 16px;
+  border: 2px solid #00000036;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  min-width: 200px;
+  transition: border-color 0.2s ease;
+}
+
+.authorSelect:focus,
+.tagSelect:focus {
+  outline: none;
+  border-color: #b6dd1b;
+}
+
+.phrasesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3%;
+  position: relative;
+  min-height: 400px;
+}
+
+.phrasesCard {
+  width: 48.5%;
+  min-height: 90px;
+  max-height: fit-content;
+  margin-bottom: 3%;
+  background: #212528;
+  border-radius: 12px;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: transform 0.2s ease;
+}
+
+.phrasesCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.phraseContent {
+  flex: 1;
+}
+
+.phraseText {
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.phraseAuthor {
+  color: #b6dd1b;
+  font-size: 16px;
+  font-weight: 400;
+} 
+
+.phraseAuthorName {
+  color: #ffffff71;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 12px 0;
+}
+
+.phraseTags {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: rgba(182, 221, 27, 0.2);
+  color: #b6dd1b;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.noResults {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .noResults {
+    padding: 60px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .noResults p {
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.paginationButton {
+  background: #b6dd1b;
+  color: #212528;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.paginationButton:hover:not(:disabled) {
+  background: #a5c91a;
+  transform: translateY(-1px);
+}
+
+.paginationButton:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.paginationInfo {
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Tablet */
+@media (max-width: 850px) {
+  .main {
+    width: 95%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .phrasesContainer {
+    gap: 2%;
+  }
+  
+  .phrasesCard {
+    width: 49%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .main {
+    width: 100%;
+    padding: 150px 15px 120px 15px; /* Top, Right, Bottom, Left */
+  }
+
+  /* Menu de pesquisa responsivo */
+  .searchContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+    margin-bottom: 25px;
+    padding: 0 5px;
+  }
+
+  .searchInput {
+    width: 100%;
+    padding: 15px 18px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+  }
+
+  .searchInput:focus {
+    border-color: #b6dd1b;
+    box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
+  }
+
+  .authorSelect,
+  .tagSelect {
+    width: 100%;
+    min-width: unset;
+    padding: 15px 18px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    background: white;
+  }
+
+  .authorSelect:focus,
+  .tagSelect:focus {
+    border-color: #b6dd1b;
+    box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
+  }
+
+  /* Cards responsivos */
+  .phrasesContainer {
+    gap: 0;
+    flex-direction: column;
+  }
+
+  .phrasesCard {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .phrasesCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+
+  .phraseText {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .phraseAuthor {
+    font-size: 14px;
+  }
+
+  .phraseAuthorName {
+    font-size: 14px;
+  }
+
+  /* Paginação responsiva */
+  .paginationContainer {
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 20px 15px;
+    border-radius: 16px;
+  }
+
+  .paginationButton {
+    width: 100%;
+    padding: 15px 24px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  .paginationInfo {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+  }
+}
+
+/* Estilos do Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: #F4F6F8;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 25px 0 5px 0;
+  border-radius: 16px 16px 0 0;
+}
+
+.modalHeader h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #212528;
+  text-transform: uppercase;
+}
+
+
+
+.modalBody {
+  padding: 24px 30px;
+}
+
+.phraseDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailItem strong {
+  color: #374151;
+  font-weight: 600;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detailItem p {
+  margin: 0;
+  color: #212528cb;
+  font-size: 17px;
+}
+
+
+.modalTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.modalTag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #b6dd1b;
+  color: #212528;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  border-radius: 0 0 16px 16px;
+}
+
+.editButton,
+.deleteButton,
+.saveButton,
+.cancelButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: 100%;
+}
+
+.editButton {
+  background: #b6dd1b;
+  color: white;
+}
+
+.editButton:hover {
+  background: #a5c91a;
+  transform: translateY(-1px);
+}
+
+.deleteButton {
+  background: #ef4444;
+  color: white;
+}
+
+.deleteButton:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.saveButton {
+  background: #b6dd1b;
+  color: #212528;
+}
+
+.saveButton:hover {
+  background: #a5c91a;
+  transform: translateY(-1px);
+}
+
+.cancelButton {
+  background: #6b7280;
+  color: white;
+}
+
+.cancelButton:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* Formulário de edição */
+.editForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  color: #374151;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.editInput,
+.editTextarea {
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.editInput:focus,
+.editTextarea:focus {
+  outline: none;
+  border-color: #b6dd1b;
+  box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
+}
+
+.editTextarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Autocomplete container */
+.autocompleteContainer {
+  position: relative;
+  width: 100%;
+}
+
+.autocompleteDropdown {
+  position: absolute;
+  width: 100%;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  margin-top: -1px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.autocompleteItem {
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.autocompleteItem:last-child {
+  border-bottom: none;
+}
+
+.autocompleteItem:hover {
+  background-color: #f9fafb;
+}
+
+.autocompleteItem:active {
+  background-color: #f3f4f6;
+}
+
+/* Cursor pointer nos cards */
+.phrasesCard {
+  cursor: pointer;
+}
+
+/* Notificações */
+.notification {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 10001;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  animation: slideInRight 0.3s ease-out;
+  max-width: 400px;
+  border-left: 4px solid;
+}
+
+.notificationSuccess {
+  background: #f0f9ff;
+  color: #0c4a6e;
+  border-left-color: #10b981;
+}
+
+.notificationError {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-left-color: #ef4444;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsividade do modal */
+@media (max-width: 768px) {
+  .modalContent {
+    width: 95%;
+    margin: 15px;
+    max-height: 85vh;
+    border-radius: 20px;
+  }
+  
+  .modalHeader {
+    padding: 25px 20px 15px 20px;
+  }
+  
+  .modalHeader h2 {
+    font-size: 20px;
+  }
+  
+  .modalBody {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .modalActions {
+    padding: 20px;
+    gap: 15px;
+  }
+  
+  /* Formulários responsivos */
+  .editForm {
+    gap: 20px;
+  }
+  
+  .formGroup label {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  
+  .editInput,
+  .editTextarea {
+    padding: 15px 18px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    width: 100%;
+  }
+  
+  .editTextarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .editInput:focus,
+  .editTextarea:focus {
+    border-color: #b6dd1b;
+    box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
+  }
+  
+  /* Detalhes da frase */
+  .phraseDetails {
+    gap: 20px;
+  }
+  
+  .detailItem strong {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .detailItem p {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .detailPhrase {
+    font-size: 17px !important;
+    font-weight: 500;
+    line-height: 1.6 !important;
+  }
+  
+  /* Tags no modal */
+  .modalTags {
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .modalTag {
+    padding: 8px 14px;
+    font-size: 14px;
+    border-radius: 20px;
+  }
+  
+  /* Botões do modal */
+  .editButton,
+  .deleteButton,
+  .saveButton,
+  .cancelButton {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+    justify-content: center;
+  }
+  
+  .editButton,
+  .deleteButton {
+    margin-bottom: 10px;
+  }
+  
+  /* Notificações */
+  .notification {
+    top: 20px;
+    right: 15px;
+    left: 15px;
+    max-width: none;
+    padding: 18px 20px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .main {
+    padding-top: 30px
+  }
+  .modalContent {
+    width: 98%;
+    margin: 10px;
+    max-height: 90vh;
+  }
+  
+  .modalHeader {
+    padding: 20px 15px 10px 15px;
+  }
+  
+  .modalHeader h2 {
+    font-size: 18px;
+  }
+  
+  .modalBody {
+    padding: 15px;
+  }
+  
+  .modalActions {
+    padding: 15px;
+    gap: 12px;
+  }
+  
+  .editInput,
+  .editTextarea {
+    padding: 12px 15px;
+    font-size: 16px;
+  }
+  
+  .editButton,
+  .deleteButton,
+  .saveButton,
+  .cancelButton {
+    padding: 12px 18px;
+    font-size: 15px;
+  }
+}

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # Serviço do Banco de Dados
+  postgres:
+    image: postgres:15-alpine
+    container_name: aspas_note_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: aspas_note
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Serviço do MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: aspas_note_mongo
+    command: [ "--quiet" ]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  # Serviço do Backend
+  backend:
+    build: ./Backend
+    container_name: aspas_note_backend
+    ports:
+      - "4000:4000"
+      - "5555:5555"
+    env_file:
+      - .env
+      - Backend/.env
+    depends_on:
+      - postgres
+      - mongodb
+    restart: unless-stopped
+
+  # Serviço do Frontend
+  frontend:
+    build: ./Frontend
+    container_name: aspas_note_frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+      - Frontend/.env
+    # Comando dinâmico: Se NODE_ENV for "development", roda "npm run dev", senão "npm start"
+    command: >
+      sh -c "if [ '$NODE_ENV' = 'development' ]; then npm run dev; else npm start; fi"
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  mongo_data:

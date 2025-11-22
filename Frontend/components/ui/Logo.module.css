@@ -1,0 +1,36 @@
+.logoContainer {
+  display: flex;
+  align-items: center;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.logoLink:hover {
+  opacity: 0.8;
+}
+
+.logo {
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.small {
+  max-width: 80px;
+  max-height: 26px;
+}
+
+.medium {
+  max-width: 120px;
+  max-height: 40px;
+}
+
+.large {
+  max-width: 170px;
+  max-height: 56px;
+}

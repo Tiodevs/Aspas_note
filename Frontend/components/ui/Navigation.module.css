@@ -1,0 +1,179 @@
+.nav {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  border-radius: 86.54px;
+  background: #121212;
+  padding: 15px 15px 15px 30px;
+  width: 800px;
+  border: 1px solid #3B3B3B;
+}
+
+.navContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navIcons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navIcon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+}
+
+.navIconText {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 5px 5px 15px;
+  border-radius: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+  gap: 5px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.navIcon img {
+  transition: filter 0.2s ease;
+}
+
+.navIcon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.navIconText:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.navIcon:active {
+  transform: scale(0.95);
+}
+
+.navIconActive {
+  background: #b6dd1b !important;
+  opacity: 1 !important;
+}
+.navIconActive2 {
+  display: none;
+}
+
+.navIconActive img {
+  filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%);
+}
+
+/* Responsividade */
+@media (max-width: 850px) {
+  .nav {
+    width: 95%;
+    max-width: 800px;
+  }
+}
+
+/* Mobile - Menu inferior */
+@media (max-width: 768px) {
+  .nav {
+    position: fixed;
+    bottom: 20px;
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 450px;
+    padding: 22px;
+    border-radius: 50px;
+    background: #212528;
+    box-shadow: 0 1px 30px rgba(195, 236, 29, 0.3);
+  }
+  
+  .navContent {
+    justify-content: center;
+  }
+  
+  /* Esconder logo no mobile */
+  .navContent > div:first-child {
+    display: none;
+  }
+  
+  .navIcons {
+    gap: 18px;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .navIcon {
+    padding: 15px;
+    border-radius: 50%;
+    min-width: 68px;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .navIcon:hover {
+    transform: translateY(-3px);
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+  
+  .navIcon:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+  
+  .navIcon img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .navIconActive {
+    background: #b6dd1b !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(182, 221, 27, 0.4);
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .nav {
+    width: fit-content;
+    padding: 16px;
+    bottom: 15px;
+  }
+  
+  .navIcons {
+    gap: 12px;
+  }
+  
+  .navIcon {
+    min-width: 60px;
+    min-height: 60px;
+    padding: 12px;
+  }
+  
+  .navIcon img {
+    width: 32px;
+    height: 32px;
+  }
+}
