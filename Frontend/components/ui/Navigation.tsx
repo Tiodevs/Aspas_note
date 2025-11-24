@@ -2,11 +2,11 @@
 
 import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Logo } from './Logo'
 import styles from './Navigation.module.css'
 import { signOut } from 'next-auth/react'
+import { Github, LogIn, Home, User, LogOut, Plus, Brain } from 'lucide-react'
 
 interface NavigationProps {
   onAddClick?: () => void
@@ -43,9 +43,10 @@ export default function Navigation({ onAddClick }: NavigationProps) {
                 title="Github"
                 href="https://github.com/Tiodevs/AspasNote_Frontend"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Repo
-                <Image src="/images/icons/GitHub.svg" alt="Github" width={40} height={40} />
+                <Github size={20} />
               </a>
 
               <Link
@@ -54,7 +55,7 @@ export default function Navigation({ onAddClick }: NavigationProps) {
                 href="/login"
               >
                 Login
-                <Image src="/images/icons/Login.svg" alt="Login" width={40} height={40}/>
+                <LogIn size={20} />
               </Link>
 
             </>
@@ -68,33 +69,32 @@ export default function Navigation({ onAddClick }: NavigationProps) {
                 title="Home"
                 href="/dashboard"
               >
-                <Image src="/images/icons/Home.svg" alt="Home" width={40} height={40} />
+                <Home size={20} />
+              </Link>
+              <Link
+                className={`${styles.navIcon} ${pathname === '/games' ? styles.navIconActive : ''}`}
+                title="Jogos"
+                href="/games"
+              >
+                <Brain size={20} />
               </Link>
               <Link
                 className={`${styles.navIcon} ${pathname === '/profile' ? styles.navIconActive : ''}`}
                 title="Perfil"
                 href="/profile"
               >
-                <Image src="/images/icons/Profile.svg" alt="Perfil" width={40} height={40} />
+                <User size={20} />
               </Link>
+
+  
 
               <button
                 className={styles.navIcon}
                 title="Sair"
                 onClick={handleSignOut}
               >
-                <Image src="/images/icons/Logout.svg" alt="Sair" width={40} height={40} />
+                <LogOut size={20} />
               </button>
-
-              {onAddClick && (
-                <button
-                  className={styles.navIcon}
-                  title="Adicionar"
-                  onClick={onAddClick}
-                >
-                  <Image src="/images/icons/Plus.svg" alt="Adicionar" width={40} height={40} />
-                </button>
-              )}
             </>
           )}
         </div>
