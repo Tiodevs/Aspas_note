@@ -4,7 +4,7 @@
   "description": "Backend da aplicação Aspas Note - App para salvar frases de famosos",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only --poll src/server.ts",
     "build": "tsc --build",
     "start": "node dist/server.js",
     "vercel-build": "prisma generate",

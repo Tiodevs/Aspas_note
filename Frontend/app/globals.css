@@ -1,3 +1,13 @@
+:root {
+  --color-white: #FFFFFF;
+  --color-primary: #00FFCC;
+  --color-primary-dark: #009C7D;
+  --color-background: #0A0A0A;
+  --color-background2: #121212;
+  --color-subtitle: #9E9E9E;
+  --color-border: #3B3B3B;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -9,7 +19,8 @@ html {
 }
 
 body {
-  background-color: #0A0A0A;
+  background-color: var(--color-background);
+  color: var(--color-white);
   font-family: inherit;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;

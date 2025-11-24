@@ -1,12 +1,18 @@
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';
+import { existsSync } from 'fs';
 
-// Carrega as variáveis de ambiente do arquivo .env
-dotenv.config({ path: resolve(__dirname, '../../.env') });
+// Carrega as variáveis de ambiente do arquivo .env se existir
+// O dotenv não sobrescreve variáveis que já existem no ambiente (por padrão)
+// Então, se as variáveis vêm do Docker via env_file, elas terão prioridade
+const envPath = resolve(__dirname, '../../.env');
+if (existsSync(envPath)) {
+    dotenv.config({ path: envPath, override: false });
+}
 
 export const envs = {
     server: {
-        port: process.env.PORT || 4000,
+        port: parseInt(process.env.PORT || '4000', 10),
         host: process.env.FRONTEND_URL || "http://localhost:3000",
     },
     auth: {
@@ -19,5 +25,8 @@ export const envs = {
     },
     database: {
         url: process.env.DATABASE_URL || " "
+    },
+    mongo: {
+        uri: process.env.MONGO_URI || "mongodb://localhost:27017/aspas_note"
     }
 }
