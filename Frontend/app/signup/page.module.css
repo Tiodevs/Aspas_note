@@ -259,6 +259,53 @@
   cursor: not-allowed;
 }
 
+/* Password Criteria */
+.passwordCriteria {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(17, 17, 17, 0.5);
+  border-radius: 8px;
+  border: 1px solid #222222;
+}
+
+.criteriaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.criteriaValid {
+  color: #10b981;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.criteriaInvalid {
+  color: #6b7280;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.criteriaText {
+  color: var(--color-subtitle);
+}
+
+.criteriaTextValid {
+  color: #10b981;
+}
+
 /* Submit Button */
 .submitButton {
   width: 100%;

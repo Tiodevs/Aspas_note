@@ -12,14 +12,15 @@ import { Mail, Instagram, Linkedin, Quote, Eye, EyeOff } from 'lucide-react'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingCredentials, setIsLoadingCredentials] = useState(false)
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsLoadingCredentials(true)
     setError('')
 
     try {
@@ -39,21 +40,23 @@ export default function LoginPage() {
     } catch {
       setError('Erro interno do servidor')
     } finally {
-      setIsLoading(false)
+      setIsLoadingCredentials(false)
     }
   }
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true)
+    setIsLoadingGoogle(true)
     setError('')
 
     try {
       await signIn('google', {
         callbackUrl: '/dashboard',
       })
+      // Nota: Não resetamos isLoadingGoogle aqui porque o signIn do Google
+      // redireciona para o Google, então o componente será desmontado
     } catch {
       setError('Erro ao fazer login com Google')
-      setIsLoading(false)
+      setIsLoadingGoogle(false)
     }
   }
 
@@ -136,7 +139,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
+                disabled={isLoadingCredentials || isLoadingGoogle}
               />
             </div>
 
@@ -155,13 +158,13 @@ export default function LoginPage() {
                   required
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  disabled={isLoading}
+                  disabled={isLoadingCredentials || isLoadingGoogle}
                 />
                 <button
                   type="button"
                   className={styles.passwordToggle}
                   onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
+                  disabled={isLoadingCredentials || isLoadingGoogle}
                   aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
                   {showPassword ? (
@@ -176,9 +179,9 @@ export default function LoginPage() {
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={isLoading}
+              disabled={isLoadingCredentials || isLoadingGoogle}
             >
-              {isLoading ? 'Entrando...' : 'Entrar'}
+              {isLoadingCredentials ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
@@ -189,7 +192,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             className={styles.googleButton}
-            disabled={isLoading}
+            disabled={isLoadingCredentials || isLoadingGoogle}
           >
             <Image
               src="/images/icons/Google.png"
@@ -198,7 +201,7 @@ export default function LoginPage() {
               height={20}
               className={styles.googleIcon}
             />
-            Entrar com o Google
+            {isLoadingGoogle ? 'Redirecionando...' : 'Entrar com o Google'}
           </button>
         </div>
       </div>
