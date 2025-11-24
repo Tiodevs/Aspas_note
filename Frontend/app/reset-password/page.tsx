@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import styles from './page.module.css'
@@ -33,17 +32,14 @@ const isPasswordValid = (criteria: PasswordCriteria): boolean => {
   return Object.values(criteria).every(Boolean)
 }
 
-export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    nome: '',
-    email: '',
-    senha: ''
-  })
-  const [isLoadingCredentials, setIsLoadingCredentials] = useState(false)
-  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false)
+function ResetPasswordForm() {
+  const [novaSenha, setNovaSenha] = useState('')
+  const [confirmarSenha, setConfirmarSenha] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordCriteria, setPasswordCriteria] = useState<PasswordCriteria>({
     minLength: false,
     hasUpperCase: false,
@@ -51,99 +47,98 @@ export default function SignupPage() {
     hasNumber: false,
     hasSpecialChar: false,
   })
+  const [token, setToken] = useState<string | null>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: value
-    }))
-
-    // Validar senha em tempo real
-    if (e.target.name === 'senha') {
-      setPasswordCriteria(validatePassword(value))
+  useEffect(() => {
+    const tokenParam = searchParams.get('token')
+    if (!tokenParam) {
+      setError('Token de recuperação não encontrado. Por favor, acesse o link enviado por email.')
+    } else {
+      setToken(tokenParam)
     }
+  }, [searchParams])
+
+  const handlePasswordChange = (value: string) => {
+    setNovaSenha(value)
+    setPasswordCriteria(validatePassword(value))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoadingCredentials(true)
+    setIsLoading(true)
     setError('')
 
-    // Validações de senha
-    const criteria = validatePassword(formData.senha)
+    // Validações
+    if (!token) {
+      setError('Token de recuperação não encontrado')
+      setIsLoading(false)
+      return
+    }
+
+    const criteria = validatePassword(novaSenha)
     if (!isPasswordValid(criteria)) {
       setError('A senha não atende aos critérios de segurança. Verifique os requisitos abaixo.')
-      setIsLoadingCredentials(false)
+      setIsLoading(false)
+      return
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      setError('As senhas não coincidem')
+      setIsLoading(false)
       return
     }
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/auth/registro`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          nome: formData.nome,
-          email: formData.email,
-          senha: formData.senha,
-          role: 'FREE' // Padrão para novos usuários
+          token,
+          novaSenha,
         }),
       })
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Erro ao criar conta')
+        throw new Error(errorData.error || 'Erro ao redefinir senha')
       }
 
       setSuccess(true)
+      
+      // Redirecionar para login após 3 segundos
       setTimeout(() => {
         router.push('/login')
-      }, 2000)
+      }, 3000)
 
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Erro interno do servidor')
     } finally {
-      setIsLoadingCredentials(false)
-    }
-  }
-
-  const handleGoogleSignUp = async () => {
-    setIsLoadingGoogle(true)
-    setError('')
-    
-    try {
-      await signIn('google', {
-        callbackUrl: '/dashboard',
-      })
-      // Nota: Não resetamos isLoadingGoogle aqui porque o signIn do Google
-      // redireciona para o Google, então o componente será desmontado
-    } catch {
-      setError('Erro ao criar conta com Google')
-      setIsLoadingGoogle(false)
+      setIsLoading(false)
     }
   }
 
   if (success) {
     return (
-      <div className={styles.successContainer}>
-        <div className={styles.wrapper}>
-          <div className={styles.successCard}>
-            <div className={styles.successIcon}>
-              <svg className={styles.successIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </div>
-            <h1 className={styles.successTitle}>
-              Conta criada com sucesso!
-            </h1>
-            <p className={styles.successSubtitle}>
-              Você será redirecionado para a página de login em instantes...
-            </p>
-            <div className={styles.progressBar}>
-              <div className={styles.progressBarInner}></div>
+      <div className={styles.container}>
+        <div className={styles.rightSide}>
+          <div className={styles.formContainer}>
+            <div className={styles.successMessage}>
+              <div className={styles.successIcon}>
+                <svg className={styles.successIconSvg} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h2 className={styles.successTitle}>Senha redefinida com sucesso!</h2>
+              <p className={styles.successText}>
+                Sua senha foi atualizada. Você será redirecionado para a página de login em instantes...
+              </p>
+              <div className={styles.progressBar}>
+                <div className={styles.progressBarInner}></div>
+              </div>
             </div>
           </div>
         </div>
@@ -192,7 +187,7 @@ export default function SignupPage() {
         </div>
       </div>
 
-      {/* Right Side - Signup Form */}
+      {/* Right Side - Reset Password Form */}
       <div className={styles.rightSide}>
         <div className={styles.formContainer}>
           <div className={styles.formHeader}>
@@ -207,10 +202,9 @@ export default function SignupPage() {
               />
             </div>
 
-            <h1 className={styles.title}>Criar uma conta</h1>
+            <h1 className={styles.title}>Redefinir senha</h1>
             <p className={styles.subtitle}>
-              Você já tem uma conta?
-              <Link href="/login" className={styles.link}>Entrar</Link>
+              Digite sua nova senha abaixo.
             </p>
           </div>
 
@@ -222,55 +216,24 @@ export default function SignupPage() {
             )}
 
             <div className={styles.inputGroup}>
-              <label htmlFor="nome" className={styles.label}>Nome completo</label>
-              <input
-                id="nome"
-                name="nome"
-                type="text"
-                className={styles.input}
-                required
-                value={formData.nome}
-                onChange={handleChange}
-                placeholder="Seu nome completo"
-                disabled={isLoadingCredentials || isLoadingGoogle}
-              />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label htmlFor="email" className={styles.label}>Email</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                className={styles.input}
-                required
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="seu@email.com"
-                disabled={isLoadingCredentials || isLoadingGoogle}
-              />
-            </div>
-
-            <div className={styles.inputGroup}>
-              <label htmlFor="senha" className={styles.label}>Senha</label>
+              <label htmlFor="novaSenha" className={styles.label}>Nova senha</label>
               <div className={styles.passwordInputWrapper}>
                 <input
-                  id="senha"
-                  name="senha"
+                  id="novaSenha"
                   type={showPassword ? 'text' : 'password'}
                   className={styles.input}
                   required
-                  value={formData.senha}
-                  onChange={handleChange}
+                  value={novaSenha}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   placeholder="••••••••"
-                  disabled={isLoadingCredentials || isLoadingGoogle}
+                  disabled={isLoading}
                   minLength={8}
                 />
                 <button
                   type="button"
                   className={styles.passwordToggle}
                   onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoadingCredentials || isLoadingGoogle}
+                  disabled={isLoading}
                   aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
                   {showPassword ? (
@@ -282,7 +245,7 @@ export default function SignupPage() {
               </div>
               
               {/* Critérios de validação de senha */}
-              {formData.senha && (
+              {novaSenha && (
                 <div className={styles.passwordCriteria}>
                   <div className={styles.criteriaItem}>
                     <span className={passwordCriteria.minLength ? styles.criteriaValid : styles.criteriaInvalid}>
@@ -328,35 +291,70 @@ export default function SignupPage() {
               )}
             </div>
 
+            <div className={styles.inputGroup}>
+              <label htmlFor="confirmarSenha" className={styles.label}>Confirmar senha</label>
+              <div className={styles.passwordInputWrapper}>
+                <input
+                  id="confirmarSenha"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  className={styles.input}
+                  required
+                  value={confirmarSenha}
+                  onChange={(e) => setConfirmarSenha(e.target.value)}
+                  placeholder="••••••••"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  disabled={isLoading}
+                  aria-label={showConfirmPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} />
+                  ) : (
+                    <Eye size={20} />
+                  )}
+                </button>
+              </div>
+            </div>
+
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={isLoadingCredentials || isLoadingGoogle}
+              disabled={isLoading}
             >
-              {isLoadingCredentials ? 'Criando conta...' : 'Criar conta'}
+              {isLoading ? 'Redefinindo...' : 'Redefinir senha'}
             </button>
           </form>
 
-          {/* Linha Divisora */}
-          <div className={styles.divider}></div>
-
-          {/* Google Signup Button */}
-          <button
-            onClick={handleGoogleSignUp}
-            className={styles.googleButton}
-            disabled={isLoadingCredentials || isLoadingGoogle}
-          >
-            <Image
-              src="/images/icons/Google.png"
-              alt="Google Icon"
-              width={20}
-              height={20}
-              className={styles.googleIcon}
-            />
-            {isLoadingGoogle ? 'Redirecionando...' : 'Continuar com o Google'}
-          </button>
+          <div className={styles.backToLogin}>
+            <Link href="/login" className={styles.backLink}>
+              ← Voltar para o login
+            </Link>
+          </div>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className={styles.container}>
+        <div className={styles.rightSide}>
+          <div className={styles.formContainer}>
+            <div className={styles.formHeader}>
+              <h1 className={styles.title}>Redefinir senha</h1>
+              <p className={styles.subtitle}>Carregando...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }

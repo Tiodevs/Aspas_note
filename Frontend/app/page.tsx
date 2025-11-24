@@ -2,7 +2,6 @@
 
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { Navigation } from '@/components/ui'
 import styles from './page.module.css'
 import { motion } from 'framer-motion'
 import { Search, Brain, Layers, Github } from 'lucide-react'
@@ -53,7 +52,7 @@ const cardVariants = {
 }
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
 
   if (status === 'loading') {
     return (

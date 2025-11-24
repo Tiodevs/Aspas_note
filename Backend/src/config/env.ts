@@ -19,9 +19,8 @@ export const envs = {
         jwtSecret: process.env.JWT_SECRET || "your-secret-key-change-in-production"
     },
     email: {
-        user: process.env.EMAIL_USER || " ",
-        password: process.env.EMAIL_PASS || " ",
-        sender: process.env.EMAIL_SENDER || " "
+        apiKey: process.env.RESEND_API_KEY || "",
+        sender: process.env.EMAIL_SENDER || "onboarding@resend.dev"
     },
     database: {
         url: process.env.DATABASE_URL || " "

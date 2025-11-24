@@ -545,11 +545,11 @@ describe('Validation Middleware', () => {
         });
       });
 
-      test('deve retornar erro 400 quando senha é muito curta', () => {
+      test('deve retornar erro 400 quando senha está vazia', () => {
         mockReq = {
           body: {
             email: 'teste@exemplo.com',
-            senha: '123'
+            senha: ''
           }
         };
 
@@ -563,7 +563,7 @@ describe('Validation Middleware', () => {
           details: expect.arrayContaining([
             {
               field: 'senha',
-              message: 'Senha deve ter pelo menos 6 caracteres'
+              message: 'Senha é obrigatória'
             }
           ])
         });
@@ -576,7 +576,7 @@ describe('Validation Middleware', () => {
           body: {
             nome: 'João Silva',
             email: 'joao@exemplo.com',
-            senha: 'senha123'
+            senha: 'Senha123!'
           }
         };
 
@@ -616,7 +616,7 @@ describe('Validation Middleware', () => {
           body: {
             nome: 'João Silva',
             email: 'joao@exemplo.com',
-            senha: 'senha123',
+            senha: 'Senha123!',
             role: 'PRO'
           }
         };
@@ -632,7 +632,7 @@ describe('Validation Middleware', () => {
           body: {
             nome: 'João Silva',
             email: 'email-invalido',
-            senha: 'senha123'
+            senha: 'Senha123!'
           }
         };
 
@@ -669,10 +669,10 @@ describe('Validation Middleware', () => {
           error: 'Dados inválidos',
           code: 'VALIDATION_ERROR',
           details: expect.arrayContaining([
-            {
+            expect.objectContaining({
               field: 'senha',
-              message: 'Senha deve ter pelo menos 6 caracteres'
-            }
+              message: expect.stringMatching(/Senha deve ter pelo menos 8 caracteres|Senha deve conter/)
+            })
           ])
         });
       });
@@ -709,7 +709,7 @@ describe('Validation Middleware', () => {
           body: {
             nome: longName,
             email: 'joao@exemplo.com',
-            senha: 'senha123'
+            senha: 'Senha123!'
           }
         };
 
@@ -734,7 +734,7 @@ describe('Validation Middleware', () => {
           body: {
             nome: 'João Silva',
             email: 'joao@exemplo.com',
-            senha: 'senha123',
+            senha: 'Senha123!',
             role: 'ADMIN'
           }
         };
@@ -750,7 +750,7 @@ describe('Validation Middleware', () => {
           body: {
             nome: 'João Silva',
             email: 'joao@exemplo.com',
-            senha: 'senha123'
+            senha: 'Senha123!'
             // role não fornecido, deve usar FREE como padrão
           }
         };
@@ -911,10 +911,10 @@ describe('Validation Middleware', () => {
           error: 'Dados inválidos',
           code: 'VALIDATION_ERROR',
           details: expect.arrayContaining([
-            {
+            expect.objectContaining({
               field: 'novaSenha',
-              message: 'Nova senha deve ter pelo menos 6 caracteres'
-            }
+              message: expect.stringMatching(/Senha deve ter pelo menos 8 caracteres|Senha deve conter/)
+            })
           ])
         });
       });
@@ -944,11 +944,11 @@ describe('Validation Middleware', () => {
         });
       });
 
-      test('deve aceitar novaSenha com exatamente 6 caracteres', () => {
+      test('deve aceitar novaSenha com critérios válidos', () => {
         mockReq = {
           body: {
             token: 'token-valido-123',
-            novaSenha: '123456'
+            novaSenha: 'NovaSenha123!'
           }
         };
 
@@ -958,8 +958,9 @@ describe('Validation Middleware', () => {
         expect(mockRes.status).not.toHaveBeenCalled();
       });
 
-      test('deve aceitar novaSenha com exatamente 100 caracteres', () => {
-        const exactPassword = 'a'.repeat(100); // Exatamente 100 caracteres
+      test('deve aceitar novaSenha com exatamente 100 caracteres válidos', () => {
+        // Senha com 100 caracteres que atende todos os critérios
+        const exactPassword = 'A' + 'a'.repeat(6) + '1' + '!'.repeat(1) + 'x'.repeat(91);
         mockReq = {
           body: {
             token: 'token-valido-123',

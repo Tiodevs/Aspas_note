@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
 import styles from './page.module.css'
 import { Navigation } from '@/components/ui'
-import Image from 'next/image'
 import { frasesAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData } from '@/lib/api'
+import { Edit, Trash2, X, Filter, Plus } from 'lucide-react'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -57,6 +57,9 @@ export default function DashboardPage() {
   
   // Estado para controlar quando não aplicar filtros automáticos
   const [skipAutoFilters, setSkipAutoFilters] = useState(false)
+  
+  // Estado para o modal de filtros
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -474,35 +477,25 @@ export default function DashboardPage() {
         <div className={styles.searchContainer}>
           <input 
             type="text" 
-            placeholder="Pesquisar" 
+            placeholder="Pesquise aqui" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
           />
-          <select 
-            name="authorSelect" 
-            id="authorSelect"
-            value={selectedAuthor}
-            onChange={(e) => setSelectedAuthor(e.target.value)}
-            className={styles.authorSelect}
+          <button 
+            onClick={openCreateModal}
+            className={styles.addButton}
+            title="Adicionar frase"
           >
-            <option value="all">Todos os autores</option>
-            {uniqueAuthors.map(author => (
-              <option key={author} value={author}>{author}</option>
-            ))}
-          </select>
-          <select 
-            name="tagSelect" 
-            id="tagSelect"
-            value={selectedTag}
-            onChange={(e) => setSelectedTag(e.target.value)}
-            className={styles.tagSelect}
+            Adicionar frase
+          </button>
+          <button 
+            onClick={() => setIsFilterModalOpen(true)}
+            className={styles.filterButton}
+            title="Filtros"
           >
-            <option value="all">Todas as tags</option>
-            {uniqueTags.map(tag => (
-              <option key={tag} value={tag}>{tag}</option>
-            ))}
-          </select>
+            <Filter size={18} />
+          </button>
         </div>
 
         {/* Lista de frases */}
@@ -659,15 +652,15 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <button onClick={handleEdit} className={styles.editButton}>
-                    <Image src="/images/icons/Pan.svg" alt="Editar" width={18} height={18} />
+                    <Edit size={18} />
                     Editar
                   </button>
                   <button onClick={handleDelete} className={styles.deleteButton}>
-                    <Image src="/images/icons/Trash.svg" alt="Excluir" width={18} height={18} />
+                    <Trash2 size={18} />
                     Excluir
                   </button>
                   <button onClick={closeModal} className={styles.cancelButton}>
-                    <p>x</p>
+                    <X size={18} />
                     Sair
                   </button>
                 </>
@@ -761,6 +754,69 @@ export default function DashboardPage() {
               </button>
               <button onClick={closeCreateModal} className={styles.cancelButton}>
                 Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de filtros */}
+      {isFilterModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsFilterModalOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Filtros</h2>
+            </div>
+            
+            <div className={styles.modalBody}>
+              <div className={styles.editForm}>
+                <div className={styles.formGroup}>
+                  <label>Autor:</label>
+                  <select 
+                    name="authorSelect" 
+                    id="authorSelect"
+                    value={selectedAuthor}
+                    onChange={(e) => setSelectedAuthor(e.target.value)}
+                    className={styles.filterSelect}
+                  >
+                    <option value="all">Todos os autores</option>
+                    {uniqueAuthors.map(author => (
+                      <option key={author} value={author}>{author}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label>Tag:</label>
+                  <select 
+                    name="tagSelect" 
+                    id="tagSelect"
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                    className={styles.filterSelect}
+                  >
+                    <option value="all">Todas as tags</option>
+                    {uniqueTags.map(tag => (
+                      <option key={tag} value={tag}>{tag}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <div className={styles.modalActions}>
+              <button onClick={() => setIsFilterModalOpen(false)} className={styles.saveButton}>
+                Aplicar Filtros
+              </button>
+              <button 
+                onClick={() => {
+                  setSelectedAuthor('all')
+                  setSelectedTag('all')
+                  setIsFilterModalOpen(false)
+                }} 
+                className={styles.cancelButton}
+              >
+                Limpar Filtros
               </button>
             </div>
           </div>
