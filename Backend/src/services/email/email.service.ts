@@ -1,45 +1,37 @@
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { envs } from '../../config/env';
 
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private resend: Resend;
   private sender: string;
 
   constructor() {
     this.sender = envs.email.sender;
     
-    // Criar o transportador do Nodemailer
-    this.transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-          user: envs.email.user,
-          pass: envs.email.password,
-        }
-    });
+    // Inicializar o Resend com a API key
+    this.resend = new Resend(envs.email.apiKey);
   }
 
   // Envia email de boas-vindas para novos usuários
   async enviarEmailBoasVindas(nome: string, email: string) {
     try {
-      const data = {
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #333; text-align: center;">Bem-vindo à Aspas Note!</h1>
+          <p>Olá ${nome},</p>
+          <p>Seja bem-vindo à nossa plataforma! Estamos felizes em tê-lo como parte da nossa comunidade.</p>
+          <p>Se tiver alguma dúvida ou precisar de ajuda, não hesite em entrar em contato conosco.</p>
+          <p>Atenciosamente,<br>Equipe Aspas Note</p>
+        </div>
+      `;
+
+      // Enviar o email usando Resend
+      await this.resend.emails.send({
         from: `Aspas Note <${this.sender}>`,
         to: email,
         subject: 'Bem-vindo à Aspas Note!',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #333; text-align: center;">Bem-vindo à Aspas Note!</h1>
-            <p>Olá ${nome},</p>
-            <p>Seja bem-vindo à nossa plataforma! Estamos felizes em tê-lo como parte da nossa comunidade.</p>
-            <p>Se tiver alguma dúvida ou precisar de ajuda, não hesite em entrar em contato conosco.</p>
-            <p>Atenciosamente,<br>Equipe Aspas Note</p>
-          </div>
-        `
-      };
-
-      // Enviar o email usando Nodemailer
-      await this.transporter.sendMail(data);
+        html: html
+      });
       
       return { success: true, message: 'Email de boas-vindas enviado com sucesso' };
     } catch (error) {
@@ -74,7 +66,7 @@ export class EmailService {
             </p>
             
             <div style="margin-top: 30px; text-align: center;">
-              <a href="${process.env.FRONTEND_URL}/login" 
+              <a href="${envs.server.host}/login" 
                  style="background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; display: inline-block;">
                 Acessar Minha Conta
               </a>
@@ -87,10 +79,10 @@ export class EmailService {
         </div>
       `;
 
-      await this.transporter.sendMail({
-        from: `"SumyIA" <${process.env.EMAIL_USER}>`,
+      await this.resend.emails.send({
+        from: `Aspas Note <${this.sender}>`,
         to: email,
-        subject: "Suas Credenciais de Acesso - SumyIA",
+        subject: "Suas Credenciais de Acesso - Aspas Note",
         html: template
       });
 
@@ -104,26 +96,26 @@ export class EmailService {
    // Enviar email de recuperação de senha
    async enviarEmailRecuperacaoSenha(nome: string, email: string, resetLink: string) {
     try {
-      const data = {
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h1 style="color: #333; text-align: center;">Recuperação de Senha</h1>
+          <p>Olá ${nome},</p>
+          <p>Recebemos uma solicitação para redefinir sua senha. Clique no link abaixo para criar uma nova senha:</p>
+          <p style="text-align: center;">
+            <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
+          </p>
+          <p>Se você não solicitou esta alteração, ignore este email.</p>
+          <p>O link é válido por 1 hora.</p>
+          <p>Atenciosamente,<br>Equipe Aspas Note</p>
+        </div>
+      `;
+
+      await this.resend.emails.send({
         from: `Aspas Note <${this.sender}>`,
         to: email,
         subject: 'Recuperação de Senha - Aspas Note',
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h1 style="color: #333; text-align: center;">Recuperação de Senha</h1>
-            <p>Olá ${nome},</p>
-            <p>Recebemos uma solicitação para redefinir sua senha. Clique no link abaixo para criar uma nova senha:</p>
-            <p style="text-align: center;">
-              <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Redefinir Senha</a>
-            </p>
-            <p>Se você não solicitou esta alteração, ignore este email.</p>
-            <p>O link é válido por 1 hora.</p>
-            <p>Atenciosamente,<br>Equipe Aspas Note</p>
-          </div>
-        `
-      };
-
-      const info = await this.transporter.sendMail(data);
+        html: html
+      });
       
       return { success: true, message: 'Email de recuperação enviado com sucesso' };
     } catch (error) {

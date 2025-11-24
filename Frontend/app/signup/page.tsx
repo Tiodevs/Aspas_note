@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Input, Button, Logo } from '@/components/ui'
 import styles from './page.module.css'
 import { Instagram, Linkedin, Eye, EyeOff } from 'lucide-react'
 

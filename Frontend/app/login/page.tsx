@@ -5,9 +5,8 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Input, Button, Logo } from '@/components/ui'
 import styles from './page.module.css'
-import { Mail, Instagram, Linkedin, Quote, Eye, EyeOff } from 'lucide-react'
+import { Instagram, Linkedin, Eye, EyeOff } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
