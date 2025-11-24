@@ -6,10 +6,10 @@
   z-index: 1000;
 
   border-radius: 86.54px;
-  background: #121212;
-  padding: 15px 15px 15px 30px;
+  background: var(--color-background2);
+  padding: 20px 20px 20px 30px;
   width: 800px;
-  border: 1px solid #3B3B3B;
+  border: 1px solid var(--color-border);
 }
 
 .navContent {
@@ -28,13 +28,14 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 5px;
+  padding: 10px;
   border-radius: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
   opacity: 0.8;
+  color: var(--color-white);
 }
 
 .navIconText {
@@ -49,22 +50,30 @@
   transition: all 0.2s ease;
   opacity: 0.8;
   gap: 5px;
-  color: #ffffff;
+  color: var(--color-white);
   text-decoration: none;
 }
 
-.navIcon img {
-  transition: filter 0.2s ease;
+.navIcon svg {
+  transition: all 0.2s ease;
+  color: inherit;
+}
+
+.navIconText svg {
+  transition: all 0.2s ease;
+  color: inherit;
 }
 
 .navIcon:hover {
   background-color: rgba(255, 255, 255, 0.1);
   opacity: 1;
+  color: var(--color-white);
 }
 
 .navIconText:hover {
   background-color: rgba(255, 255, 255, 0.1);
   opacity: 1;
+  color: var(--color-white);
 }
 
 .navIcon:active {
@@ -74,14 +83,15 @@
 .navIconActive {
   background: var(--color-primary) !important;
   opacity: 1 !important;
+  color: #000000 !important;
+}
+
+.navIconActive svg {
+  color: #000000 !important;
 }
 
 .navIconActive2 {
   display: none;
-}
-
-.navIconActive img {
-  filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%);
 }
 
 /* Responsividade */
@@ -104,8 +114,9 @@
     max-width: 450px;
     padding: 22px;
     border-radius: 50px;
-    background: #212528;
-    box-shadow: 0 1px 30px rgba(195, 236, 29, 0.3);
+    background: var(--color-background2);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 20px rgba(0, 255, 204, 0.15);
   }
 
   .navContent {
@@ -143,15 +154,20 @@
     transform: translateY(-1px) scale(0.98);
   }
 
-  .navIcon img {
-    width: 36px;
-    height: 36px;
+  .navIcon svg {
+    width: 24px;
+    height: 24px;
   }
 
   .navIconActive {
     background: var(--color-primary) !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(182, 221, 27, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 255, 204, 0.4);
+    color: #000000 !important;
+  }
+
+  .navIconActive svg {
+    color: #000000 !important;
   }
 }
 
@@ -173,8 +189,8 @@
     padding: 12px;
   }
 
-  .navIcon img {
-    width: 32px;
-    height: 32px;
+  .navIcon svg {
+    width: 20px;
+    height: 20px;
   }
 }
