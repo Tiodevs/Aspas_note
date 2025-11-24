@@ -145,7 +145,7 @@ export default function LoginPage() {
             <div className={styles.inputGroup}>
               <div className={styles.labelRow}>
                 <label htmlFor="senha" className={styles.label}>Senha</label>
-                <Link href="#" className={styles.forgotPasswordLink}>
+                <Link href="/forgot-password" className={styles.forgotPasswordLink}>
                   Recuperar a senha
                 </Link>
               </div>
