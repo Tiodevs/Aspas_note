@@ -123,10 +123,12 @@
 .rightSide {
   flex: 1;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* align-items: center;  <-- Removed to allow scrolling */
+  /* justify-content: center; <-- Removed to allow scrolling */
   background: var(--color-background);
   position: relative;
+  overflow-y: auto;
+  /* Enable vertical scrolling */
 }
 
 .formContainer {
@@ -135,6 +137,8 @@
   padding: 2rem;
   display: flex;
   flex-direction: column;
+  margin: auto;
+  /* Center the form vertically and horizontally when space permits */
 }
 
 .formHeader {
@@ -438,6 +442,7 @@
   from {
     width: 0%;
   }
+
   to {
     width: 100%;
   }

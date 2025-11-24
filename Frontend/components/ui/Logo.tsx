@@ -28,7 +28,7 @@ export const Logo: React.FC<LogoProps> = ({
 
   const logoImage = (
     <Image
-      src={variant === 'primary' ? '/images/logos/Logo01Apas.png' : '/images/logos/Logo02.png'}
+      src={variant === 'primary' ? '/images/logos/Logo.png' : '/images/logos/Logo.png'}
       alt="Aspas Logo"
       width={width}
       height={height}
