@@ -44,7 +44,7 @@
   width: 4rem;
   height: 4rem;
   border: 3px solid rgba(182, 221, 27, 0.2);
-  border-top: 3px solid #b6dd1b;
+  border-top: 3px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -53,7 +53,7 @@
   width: 4rem;
   height: 4rem;
   border: 4px solid rgba(182, 221, 27, 0.2);
-  border-top: 4px solid #b6dd1b;
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   box-shadow: 0 4px 12px rgba(182, 221, 27, 0.3);
@@ -90,7 +90,7 @@
 
 .searchInput:focus {
   outline: none;
-  border-color: #b6dd1b;
+  border-color: var(--color-primary);
 }
 
 .authorSelect,
@@ -107,7 +107,7 @@
 .authorSelect:focus,
 .tagSelect:focus {
   outline: none;
-  border-color: #b6dd1b;
+  border-color: var(--color-primary);
 }
 
 .phrasesContainer {
@@ -149,10 +149,10 @@
 }
 
 .phraseAuthor {
-  color: #b6dd1b;
+  color: var(--color-primary);
   font-size: 16px;
   font-weight: 400;
-} 
+}
 
 .phraseAuthorName {
   color: #ffffff71;
@@ -170,7 +170,7 @@
 
 .tag {
   background: rgba(182, 221, 27, 0.2);
-  color: #b6dd1b;
+  color: var(--color-primary);
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 14px;
@@ -190,7 +190,7 @@
     border-radius: 16px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
-  
+
   .noResults p {
     font-size: 16px;
     font-weight: 500;
@@ -209,7 +209,7 @@
 }
 
 .paginationButton {
-  background: #b6dd1b;
+  background: var(--color-primary);
   color: #212528;
   border: none;
   padding: 12px 24px;
@@ -242,11 +242,11 @@
     padding-left: 20px;
     padding-right: 20px;
   }
-  
+
   .phrasesContainer {
     gap: 2%;
   }
-  
+
   .phrasesCard {
     width: 49%;
   }
@@ -256,7 +256,8 @@
 @media (max-width: 768px) {
   .main {
     width: 100%;
-    padding: 150px 15px 120px 15px; /* Top, Right, Bottom, Left */
+    padding: 150px 15px 120px 15px;
+    /* Top, Right, Bottom, Left */
   }
 
   /* Menu de pesquisa responsivo */
@@ -277,7 +278,7 @@
   }
 
   .searchInput:focus {
-    border-color: #b6dd1b;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
   }
 
@@ -294,7 +295,7 @@
 
   .authorSelect:focus,
   .tagSelect:focus {
-    border-color: #b6dd1b;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
   }
 
@@ -387,6 +388,7 @@
     opacity: 0;
     transform: scale(0.9) translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -452,7 +454,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #b6dd1b;
+  border: 1px solid var(--color-primary);
   color: #212528;
   padding: 6px 12px;
   border-radius: 20px;
@@ -491,7 +493,7 @@
 }
 
 .editButton {
-  background: #b6dd1b;
+  background: var(--color-primary);
   color: white;
 }
 
@@ -511,7 +513,7 @@
 }
 
 .saveButton {
-  background: #b6dd1b;
+  background: var(--color-primary);
   color: #212528;
 }
 
@@ -564,7 +566,7 @@
 .editInput:focus,
 .editTextarea:focus {
   outline: none;
-  border-color: #b6dd1b;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
 }
 
@@ -654,6 +656,7 @@
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -668,36 +671,36 @@
     max-height: 85vh;
     border-radius: 20px;
   }
-  
+
   .modalHeader {
     padding: 25px 20px 15px 20px;
   }
-  
+
   .modalHeader h2 {
     font-size: 20px;
   }
-  
+
   .modalBody {
     padding: 20px;
     max-height: 60vh;
     overflow-y: auto;
   }
-  
+
   .modalActions {
     padding: 20px;
     gap: 15px;
   }
-  
+
   /* Formulários responsivos */
   .editForm {
     gap: 20px;
   }
-  
+
   .formGroup label {
     font-size: 15px;
     margin-bottom: 8px;
   }
-  
+
   .editInput,
   .editTextarea {
     padding: 15px 18px;
@@ -706,51 +709,51 @@
     border: 2px solid #e5e7eb;
     width: 100%;
   }
-  
+
   .editTextarea {
     min-height: 100px;
     resize: vertical;
   }
-  
+
   .editInput:focus,
   .editTextarea:focus {
-    border-color: #b6dd1b;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(182, 221, 27, 0.1);
   }
-  
+
   /* Detalhes da frase */
   .phraseDetails {
     gap: 20px;
   }
-  
+
   .detailItem strong {
     font-size: 14px;
     margin-bottom: 8px;
   }
-  
+
   .detailItem p {
     font-size: 16px;
     line-height: 1.5;
   }
-  
+
   .detailPhrase {
     font-size: 17px !important;
     font-weight: 500;
     line-height: 1.6 !important;
   }
-  
+
   /* Tags no modal */
   .modalTags {
     gap: 10px;
     margin-top: 10px;
   }
-  
+
   .modalTag {
     padding: 8px 14px;
     font-size: 14px;
     border-radius: 20px;
   }
-  
+
   /* Botões do modal */
   .editButton,
   .deleteButton,
@@ -762,12 +765,12 @@
     border-radius: 12px;
     justify-content: center;
   }
-  
+
   .editButton,
   .deleteButton {
     margin-bottom: 10px;
   }
-  
+
   /* Notificações */
   .notification {
     top: 20px;
@@ -785,35 +788,36 @@
   .main {
     padding-top: 30px
   }
+
   .modalContent {
     width: 98%;
     margin: 10px;
     max-height: 90vh;
   }
-  
+
   .modalHeader {
     padding: 20px 15px 10px 15px;
   }
-  
+
   .modalHeader h2 {
     font-size: 18px;
   }
-  
+
   .modalBody {
     padding: 15px;
   }
-  
+
   .modalActions {
     padding: 15px;
     gap: 12px;
   }
-  
+
   .editInput,
   .editTextarea {
     padding: 12px 15px;
     font-size: 16px;
   }
-  
+
   .editButton,
   .deleteButton,
   .saveButton,

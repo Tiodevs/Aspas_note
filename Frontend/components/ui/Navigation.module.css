@@ -72,9 +72,10 @@
 }
 
 .navIconActive {
-  background: #b6dd1b !important;
+  background: var(--color-primary) !important;
   opacity: 1 !important;
 }
+
 .navIconActive2 {
   display: none;
 }
@@ -106,22 +107,22 @@
     background: #212528;
     box-shadow: 0 1px 30px rgba(195, 236, 29, 0.3);
   }
-  
+
   .navContent {
     justify-content: center;
   }
-  
+
   /* Esconder logo no mobile */
-  .navContent > div:first-child {
+  .navContent>div:first-child {
     display: none;
   }
-  
+
   .navIcons {
     gap: 18px;
     justify-content: center;
     width: 100%;
   }
-  
+
   .navIcon {
     padding: 15px;
     border-radius: 50%;
@@ -132,23 +133,23 @@
     justify-content: center;
     transition: all 0.3s ease;
   }
-  
+
   .navIcon:hover {
     transform: translateY(-3px);
     background-color: rgba(255, 255, 255, 0.15);
   }
-  
+
   .navIcon:active {
     transform: translateY(-1px) scale(0.98);
   }
-  
+
   .navIcon img {
     width: 36px;
     height: 36px;
   }
-  
+
   .navIconActive {
-    background: #b6dd1b !important;
+    background: var(--color-primary) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(182, 221, 27, 0.4);
   }
@@ -161,17 +162,17 @@
     padding: 16px;
     bottom: 15px;
   }
-  
+
   .navIcons {
     gap: 12px;
   }
-  
+
   .navIcon {
     min-width: 60px;
     min-height: 60px;
     padding: 12px;
   }
-  
+
   .navIcon img {
     width: 32px;
     height: 32px;

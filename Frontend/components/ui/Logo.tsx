@@ -11,12 +11,12 @@ interface LogoProps {
   variant?: 'primary' | 'secondary'
 }
 
-export const Logo: React.FC<LogoProps> = ({ 
+export const Logo: React.FC<LogoProps> = ({
   size = 'medium',
   variant = 'primary',
   clickable = false,
   href = '/',
-  className 
+  className
 }) => {
   const sizeConfig = {
     small: { width: 80, height: 26 },
@@ -28,7 +28,7 @@ export const Logo: React.FC<LogoProps> = ({
 
   const logoImage = (
     <Image
-      src={variant === 'primary' ? '/images/logos/Logo01.png' : '/images/logos/Logo02.png'}
+      src={variant === 'primary' ? '/images/logos/Logo01Apas.png' : '/images/logos/Logo02.png'}
       alt="Aspas Logo"
       width={width}
       height={height}
