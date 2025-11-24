@@ -7,6 +7,17 @@ export enum Role {
     PRO = 'PRO',
 }
 
+// Função de validação de senha forte
+const passwordValidation = z
+    .string()
+    .min(1, 'Senha é obrigatória')
+    .min(8, 'Senha deve ter pelo menos 8 caracteres')
+    .max(100, 'Senha deve ter no máximo 100 caracteres')
+    .regex(/[A-Z]/, 'Senha deve conter pelo menos uma letra maiúscula')
+    .regex(/[a-z]/, 'Senha deve conter pelo menos uma letra minúscula')
+    .regex(/[0-9]/, 'Senha deve conter pelo menos um número')
+    .regex(/[^A-Za-z0-9]/, 'Senha deve conter pelo menos um caractere especial (!@#$%^&*(),.?":{}|<> etc.)');
+
 // Schema para usuário completo
 export const userSchema = z.object({
     id: z.string(),
@@ -20,6 +31,8 @@ export const userSchema = z.object({
 });
 
 // Schema para login
+// Nota: No login não validamos a força da senha, apenas se foi informada
+// pois a senha já foi validada no registro
 export const loginSchema = z.object({
   email: z
     .string()
@@ -28,7 +41,6 @@ export const loginSchema = z.object({
   senha: z
     .string()
     .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter pelo menos 6 caracteres')
 });
 
 // Schema para registro
@@ -44,11 +56,7 @@ export const registerSchema = z.object({
     .min(1, 'Email é obrigatório')
     .email('Email inválido')
     .toLowerCase(),
-  senha: z
-    .string()
-    .min(1, 'Senha é obrigatória')
-    .min(6, 'Senha deve ter pelo menos 6 caracteres')
-    .max(100, 'Senha deve ter no máximo 100 caracteres'),
+  senha: passwordValidation,
   role: z
     .enum([Role.ADMIN, Role.FREE, Role.PRO])
     .optional()
@@ -69,11 +77,7 @@ export const resetPasswordSchema = z.object({
   token: z
     .string()
     .min(1, 'Token é obrigatório'),
-  novaSenha: z
-    .string()
-    .min(1, 'Nova senha é obrigatória')
-    .min(6, 'Nova senha deve ter pelo menos 6 caracteres')
-    .max(100, 'Nova senha deve ter no máximo 100 caracteres')
+  novaSenha: passwordValidation
 });
 
 // Schema para OAuth signin

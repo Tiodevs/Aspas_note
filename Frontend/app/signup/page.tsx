@@ -9,34 +9,74 @@ import { Input, Button, Logo } from '@/components/ui'
 import styles from './page.module.css'
 import { Instagram, Linkedin, Eye, EyeOff } from 'lucide-react'
 
+// Interface para critérios de validação de senha
+interface PasswordCriteria {
+  minLength: boolean
+  hasUpperCase: boolean
+  hasLowerCase: boolean
+  hasNumber: boolean
+  hasSpecialChar: boolean
+}
+
+// Função para validar senha
+const validatePassword = (password: string): PasswordCriteria => {
+  return {
+    minLength: password.length >= 8,
+    hasUpperCase: /[A-Z]/.test(password),
+    hasLowerCase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecialChar: /[^A-Za-z0-9]/.test(password),
+  }
+}
+
+// Função para verificar se a senha atende todos os critérios
+const isPasswordValid = (criteria: PasswordCriteria): boolean => {
+  return Object.values(criteria).every(Boolean)
+}
+
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     senha: ''
   })
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingCredentials, setIsLoadingCredentials] = useState(false)
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [passwordCriteria, setPasswordCriteria] = useState<PasswordCriteria>({
+    minLength: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+  })
   const router = useRouter()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: value
     }))
+
+    // Validar senha em tempo real
+    if (e.target.name === 'senha') {
+      setPasswordCriteria(validatePassword(value))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsLoadingCredentials(true)
     setError('')
 
-    // Validações básicas
-    if (formData.senha.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres')
-      setIsLoading(false)
+    // Validações de senha
+    const criteria = validatePassword(formData.senha)
+    if (!isPasswordValid(criteria)) {
+      setError('A senha não atende aos critérios de segurança. Verifique os requisitos abaixo.')
+      setIsLoadingCredentials(false)
       return
     }
 
@@ -67,21 +107,23 @@ export default function SignupPage() {
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'Erro interno do servidor')
     } finally {
-      setIsLoading(false)
+      setIsLoadingCredentials(false)
     }
   }
 
   const handleGoogleSignUp = async () => {
-    setIsLoading(true)
+    setIsLoadingGoogle(true)
     setError('')
     
     try {
       await signIn('google', {
         callbackUrl: '/dashboard',
       })
+      // Nota: Não resetamos isLoadingGoogle aqui porque o signIn do Google
+      // redireciona para o Google, então o componente será desmontado
     } catch {
       setError('Erro ao criar conta com Google')
-      setIsLoading(false)
+      setIsLoadingGoogle(false)
     }
   }
 
@@ -191,7 +233,7 @@ export default function SignupPage() {
                 value={formData.nome}
                 onChange={handleChange}
                 placeholder="Seu nome completo"
-                disabled={isLoading}
+                disabled={isLoadingCredentials || isLoadingGoogle}
               />
             </div>
 
@@ -206,7 +248,7 @@ export default function SignupPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="seu@email.com"
-                disabled={isLoading}
+                disabled={isLoadingCredentials || isLoadingGoogle}
               />
             </div>
 
@@ -222,14 +264,14 @@ export default function SignupPage() {
                   value={formData.senha}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  disabled={isLoading}
-                  minLength={6}
+                  disabled={isLoadingCredentials || isLoadingGoogle}
+                  minLength={8}
                 />
                 <button
                   type="button"
                   className={styles.passwordToggle}
                   onClick={() => setShowPassword(!showPassword)}
-                  disabled={isLoading}
+                  disabled={isLoadingCredentials || isLoadingGoogle}
                   aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
                 >
                   {showPassword ? (
@@ -239,15 +281,60 @@ export default function SignupPage() {
                   )}
                 </button>
               </div>
-              <p className={styles.hint}>Mínimo 6 caracteres</p>
+              
+              {/* Critérios de validação de senha */}
+              {formData.senha && (
+                <div className={styles.passwordCriteria}>
+                  <div className={styles.criteriaItem}>
+                    <span className={passwordCriteria.minLength ? styles.criteriaValid : styles.criteriaInvalid}>
+                      {passwordCriteria.minLength ? '✓' : '✗'}
+                    </span>
+                    <span className={passwordCriteria.minLength ? styles.criteriaTextValid : styles.criteriaText}>
+                      Mínimo 8 caracteres
+                    </span>
+                  </div>
+                  <div className={styles.criteriaItem}>
+                    <span className={passwordCriteria.hasUpperCase ? styles.criteriaValid : styles.criteriaInvalid}>
+                      {passwordCriteria.hasUpperCase ? '✓' : '✗'}
+                    </span>
+                    <span className={passwordCriteria.hasUpperCase ? styles.criteriaTextValid : styles.criteriaText}>
+                      Uma letra maiúscula
+                    </span>
+                  </div>
+                  <div className={styles.criteriaItem}>
+                    <span className={passwordCriteria.hasLowerCase ? styles.criteriaValid : styles.criteriaInvalid}>
+                      {passwordCriteria.hasLowerCase ? '✓' : '✗'}
+                    </span>
+                    <span className={passwordCriteria.hasLowerCase ? styles.criteriaTextValid : styles.criteriaText}>
+                      Uma letra minúscula
+                    </span>
+                  </div>
+                  <div className={styles.criteriaItem}>
+                    <span className={passwordCriteria.hasNumber ? styles.criteriaValid : styles.criteriaInvalid}>
+                      {passwordCriteria.hasNumber ? '✓' : '✗'}
+                    </span>
+                    <span className={passwordCriteria.hasNumber ? styles.criteriaTextValid : styles.criteriaText}>
+                      Um número
+                    </span>
+                  </div>
+                  <div className={styles.criteriaItem}>
+                    <span className={passwordCriteria.hasSpecialChar ? styles.criteriaValid : styles.criteriaInvalid}>
+                      {passwordCriteria.hasSpecialChar ? '✓' : '✗'}
+                    </span>
+                    <span className={passwordCriteria.hasSpecialChar ? styles.criteriaTextValid : styles.criteriaText}>
+                      Um caractere especial (!@#$%^&* etc.)
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={isLoading}
+              disabled={isLoadingCredentials || isLoadingGoogle}
             >
-              {isLoading ? 'Criando conta...' : 'Criar conta'}
+              {isLoadingCredentials ? 'Criando conta...' : 'Criar conta'}
             </button>
           </form>
 
@@ -258,7 +345,7 @@ export default function SignupPage() {
           <button
             onClick={handleGoogleSignUp}
             className={styles.googleButton}
-            disabled={isLoading}
+            disabled={isLoadingCredentials || isLoadingGoogle}
           >
             <Image
               src="/images/icons/Google.png"
@@ -267,7 +354,7 @@ export default function SignupPage() {
               height={20}
               className={styles.googleIcon}
             />
-            Continuar com o Google
+            {isLoadingGoogle ? 'Redirecionando...' : 'Continuar com o Google'}
           </button>
         </div>
       </div>
