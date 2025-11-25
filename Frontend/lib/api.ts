@@ -90,7 +90,7 @@ class ApiClient {
     return response.json()
   }
 
-  async put(endpoint: string, data: PhraseUpdateData) {
+  async put(endpoint: string, data: PhraseUpdateData | UpdateProfileData) {
     const headers = await this.getAuthHeaders()
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -202,7 +202,47 @@ export interface PhraseResponse {
   };
 }
 
+// Interfaces para Profile
+export interface UpdateProfileData {
+  avatar?: string | null;
+  bio?: string | null;
+}
 
+export interface Profile {
+  id: string;
+  avatar: string | null;
+  bio: string | null;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  followersCount: number;
+  followingCount: number;
+  user: {
+    id: string;
+    name: string | null;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  };
+}
+
+// Funções específicas para Profile
+export const profileAPI = {
+  getMyProfile: (): Promise<Profile> => apiClient.get('/profile/me'),
+  getByUserId: (userId: string): Promise<Profile> => apiClient.get(`/profile/user/${userId}`),
+  getById: (id: string): Promise<Profile> => apiClient.get(`/profile/${id}`),
+  update: (data: UpdateProfileData): Promise<{ message: string; profile: Profile }> => 
+    apiClient.put('/profile/me', data),
+  create: (data: UpdateProfileData): Promise<{ message: string; profile: Profile }> => 
+    apiClient.post('/profile', data),
+  getFollowers: (userId: string): Promise<any[]> => apiClient.get(`/profile/user/${userId}/followers`),
+  getFollowing: (userId: string): Promise<any[]> => apiClient.get(`/profile/user/${userId}/following`),
+  follow: (followingUserId: string): Promise<{ message: string }> => 
+    apiClient.post('/profile/follow', { followingUserId }),
+  unfollow: (followingUserId: string): Promise<{ message: string }> => 
+    apiClient.post('/profile/unfollow', { followingUserId }),
+}
 
 // Exemplo de uso:
 // import { frasesAPI } from '@/lib/api'
