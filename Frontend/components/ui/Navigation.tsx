@@ -85,16 +85,6 @@ export default function Navigation({ onAddClick }: NavigationProps) {
               >
                 <User size={20} />
               </Link>
-
-  
-
-              <button
-                className={styles.navIcon}
-                title="Sair"
-                onClick={handleSignOut}
-              >
-                <LogOut size={20} />
-              </button>
             </>
           )}
         </div>
