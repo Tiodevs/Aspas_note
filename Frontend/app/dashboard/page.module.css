@@ -564,6 +564,100 @@
   margin-top: 8px;
 }
 
+.tagManager {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tagInputRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tagInputField {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-background);
+  color: var(--color-white);
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.tagInputField:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.tagAddButton {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.tagAddButton:hover {
+  background: #00e6b8;
+  transform: translateY(-1px);
+}
+
+.tagSuggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagSuggestionItem {
+  border: 1px solid var(--color-border);
+  background: var(--color-background2);
+  color: var(--color-white);
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.tagSuggestionItem:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.selectedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--color-primary);
+  background: rgba(0, 255, 204, 0.1);
+  color: var(--color-primary);
+  font-size: 14px;
+}
+
+.tagRemoveButton {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+}
+
 .modalTag {
   display: flex;
   align-items: center;
@@ -884,6 +978,15 @@
   .modalTags {
     gap: 10px;
     margin-top: 10px;
+  }
+
+  .tagInputRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tagAddButton {
+    width: 100%;
   }
 
   .modalTag {
