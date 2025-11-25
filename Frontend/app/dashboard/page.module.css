@@ -56,7 +56,6 @@
   border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  box-shadow: 0 4px 12px rgba(0, 255, 204, 0.3);
 }
 
 @keyframes spin {
@@ -67,9 +66,13 @@
 
 
 .main {
-  padding-top: 150px;
+  padding-top: 130px;
   width: 800px;
   margin: 0 auto;
+}
+
+.mobileLogo {
+  display: none;
 }
 
 .searchContainer {
@@ -77,17 +80,38 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.searchActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.searchInputWrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .searchInput {
-  flex: 1;
-  padding: 12px 16px;
+  width: 100%;
+  padding: 12px 45px 12px 16px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 16px;
   background: var(--color-background2);
   color: var(--color-white);
   transition: border-color 0.2s ease;
+}
+
+.searchIcon {
+  position: absolute;
+  right: 16px;
+  color: var(--color-subtitle);
+  pointer-events: none;
 }
 
 .searchInput::placeholder {
@@ -97,7 +121,6 @@
 .searchInput:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(0, 255, 204, 0.05);
 }
 
 .addButton {
@@ -119,7 +142,6 @@
 .addButton:hover {
   background: #00e6b8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 204, 0.25);
 }
 
 .filterButton {
@@ -142,24 +164,29 @@
 .filterButton:hover {
   background: #00e6b8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 204, 0.25);
 }
 
 .filterSelect {
   padding: 12px 16px;
+  padding-right: 48px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   background: var(--color-background);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 16px) center;
+  background-size: 18px;
   color: var(--color-white);
   width: 100%;
-  transition: border-color 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
 }
 
 .filterSelect:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(0, 255, 204, 0.05);
 }
 
 .phrasesContainer {
@@ -188,7 +215,6 @@
 .phrasesCard:hover {
   transform: translateY(-2px);
   border-color: var(--color-primary);
-  box-shadow: 0 4px 12px rgba(0, 255, 204, 0.15);
 }
 
 .phraseContent {
@@ -244,7 +270,6 @@
     background: var(--color-background2);
     border: 1px solid var(--color-border);
     border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   }
 
   .noResults p {
@@ -263,7 +288,6 @@
   background: var(--color-background2);
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .paginationButton {
@@ -280,7 +304,6 @@
 .paginationButton:hover:not(:disabled) {
   background: #00e6b8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 204, 0.25);
 }
 
 .paginationButton:disabled {
@@ -316,22 +339,40 @@
 @media (max-width: 768px) {
   .main {
     width: 100%;
-    padding: 150px 15px 120px 15px;
+    padding: 20px 15px 120px 15px;
     /* Top, Right, Bottom, Left */
+  }
+
+  .mobileLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
   }
 
   /* Menu de pesquisa responsivo */
   .searchContainer {
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 25px;
-    padding: 0 5px;
+    padding: 0;
+  }
+
+  .searchInputWrapper {
+    width: 100%;
+  }
+
+  .searchActions {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .searchInput {
-    flex: 1;
-    padding: 15px 18px;
+    width: 100%;
+    padding: 15px 50px 15px 18px;
     font-size: 16px;
     border-radius: 12px;
     border: 1px solid var(--color-border);
@@ -339,12 +380,17 @@
     color: var(--color-white);
   }
 
+  .searchIcon {
+    right: 18px;
+  }
+
   .searchInput:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 4px rgba(0, 255, 204, 0.05);
   }
 
   .addButton {
+    flex: 1;
+    width: auto;
     padding: 15px 18px;
     font-size: 14px;
     border-radius: 12px;
@@ -352,10 +398,20 @@
   }
 
   .filterButton {
-    min-width: 50px;
+    width: auto;
+    min-width: 60px;
     min-height: 50px;
     padding: 15px;
     border-radius: 12px;
+  }
+
+  .filterSelect {
+    padding: 15px 24px;
+    padding-right: 60px;
+    border-radius: 14px;
+    font-size: 16px;
+    background-position: calc(100% - 20px) center;
+    background-size: 20px;
   }
 
   /* Cards responsivos */
@@ -370,14 +426,12 @@
     padding: 25px;
     border-radius: 16px;
     border: 1px solid var(--color-border);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.3s ease, border-color 0.3s ease;
   }
 
   .phrasesCard:hover {
     transform: translateY(-4px);
     border-color: var(--color-primary);
-    box-shadow: 0 8px 32px rgba(0, 255, 204, 0.2);
   }
 
   .phraseText {
@@ -430,7 +484,6 @@
   align-items: center;
   justify-content: center;
   z-index: 10000;
-  backdrop-filter: blur(4px);
 }
 
 .modalContent {
@@ -441,7 +494,6 @@
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: modalSlideIn 0.3s ease-out;
 }
 
@@ -565,7 +617,6 @@
 .editButton:hover {
   background: #00e6b8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 204, 0.25);
 }
 
 .deleteButton {
@@ -576,7 +627,6 @@
 .deleteButton:hover {
   background: #dc2626;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
 }
 
 .saveButton {
@@ -587,7 +637,6 @@
 .saveButton:hover {
   background: #00e6b8;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(0, 255, 204, 0.25);
 }
 
 .cancelButton {
@@ -647,7 +696,6 @@
 .editTextarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(0, 255, 204, 0.05);
 }
 
 .editTextarea {
@@ -682,7 +730,6 @@
   overflow-y: auto;
   z-index: 10;
   margin-top: -1px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .autocompleteItem {
@@ -721,7 +768,6 @@
   font-weight: 600;
   font-size: 14px;
   z-index: 10001;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   animation: slideInRight 0.3s ease-out;
   max-width: 400px;
   border-left: 4px solid;
@@ -810,7 +856,6 @@
   .editInput:focus,
   .editTextarea:focus {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 4px rgba(0, 255, 204, 0.05);
   }
 
   /* Detalhes da frase */
@@ -880,6 +925,14 @@
 @media (max-width: 480px) {
   .main {
     padding-top: 30px
+  }
+
+  .addButton {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
   }
 
   .modalContent {

@@ -116,7 +116,6 @@
     border-radius: 50px;
     background: var(--color-background2);
     border: 1px solid var(--color-border);
-    box-shadow: 0 4px 20px rgba(0, 255, 204, 0.15);
   }
 
   .navContent {

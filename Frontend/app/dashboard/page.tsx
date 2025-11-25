@@ -4,9 +4,9 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
 import styles from './page.module.css'
-import { Navigation } from '@/components/ui'
+import { Navigation, Logo } from '@/components/ui'
 import { frasesAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData } from '@/lib/api'
-import { Edit, Trash2, X, Filter, Plus } from 'lucide-react'
+import { Edit, Trash2, X, Filter, Plus, Search } from 'lucide-react'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -473,29 +473,39 @@ export default function DashboardPage() {
       <Navigation onAddClick={openCreateModal} />
 
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
+        
         {/* Input de pesquisa */}
         <div className={styles.searchContainer}>
-          <input 
-            type="text" 
-            placeholder="Pesquise aqui" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-          />
-          <button 
-            onClick={openCreateModal}
-            className={styles.addButton}
-            title="Adicionar frase"
-          >
-            Adicionar frase
-          </button>
-          <button 
-            onClick={() => setIsFilterModalOpen(true)}
-            className={styles.filterButton}
-            title="Filtros"
-          >
-            <Filter size={18} />
-          </button>
+          <div className={styles.searchInputWrapper}>
+            <input 
+              type="text" 
+              placeholder="Pesquise aqui" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+            />
+            <Search className={styles.searchIcon} size={18} />
+          </div>
+          <div className={styles.searchActions}>
+            <button 
+              onClick={openCreateModal}
+              className={styles.addButton}
+              title="Adicionar frase"
+            >
+              Adicionar frase
+            </button>
+            <button 
+              onClick={() => setIsFilterModalOpen(true)}
+              className={styles.filterButton}
+              title="Filtros"
+            >
+              <Filter size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Lista de frases */}
