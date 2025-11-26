@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
 
 // Rotas que requerem autenticação
-const protectedRoutes = ['/dashboard', '/profile', '/settings']
+const protectedRoutes = ['/phrases', '/profile', '/settings']
 
 // Rotas que só usuários não autenticados podem acessar
 const authRoutes = ['/login', '/signup']
@@ -23,7 +23,7 @@ export default auth((req: NextRequest & { auth: any }) => {
   }
 
   if (isAuthRoute && isLoggedIn) {
-    return NextResponse.redirect(new URL('/dashboard', nextUrl))
+    return NextResponse.redirect(new URL('/phrases', nextUrl))
   }
 
   return NextResponse.next()

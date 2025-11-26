@@ -116,7 +116,7 @@ export default function SignupPage() {
     
     try {
       await signIn('google', {
-        callbackUrl: '/dashboard',
+        callbackUrl: '/phrases',
       })
       // Nota: Não resetamos isLoadingGoogle aqui porque o signIn do Google
       // redireciona para o Google, então o componente será desmontado
