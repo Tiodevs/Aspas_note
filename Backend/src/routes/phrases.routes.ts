@@ -11,6 +11,9 @@ const phrasesController = new PhrasesController();
 router.get('/filters/authors', authenticateToken, phrasesController.getUniqueAuthors);
 router.get('/filters/tags', authenticateToken, phrasesController.getUniqueTags);
 
+// Rota para feed (deve vir antes das rotas com parâmetros)
+router.get('/feed', authenticateToken, phrasesController.getFeed);
+
 // Rota para frases por usuário (deve vir antes da rota /:id)
 router.get('/user/:userId', authenticateToken, validateParams(userParamsSchema), phrasesController.listPhrasesByUser);
 

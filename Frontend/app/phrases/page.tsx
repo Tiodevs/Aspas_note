@@ -2,11 +2,11 @@
 
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import styles from './page.module.css'
-import { Navigation } from '@/components/ui'
+import { Navigation, Logo, PhraseCard } from '@/components/ui'
 import { frasesAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData } from '@/lib/api'
-import { Edit, Trash2, X, Filter, Plus } from 'lucide-react'
+import { Edit, Trash2, X, Filter, Plus, Search } from 'lucide-react'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -28,6 +28,8 @@ export default function DashboardPage() {
   const [selectedTag, setSelectedTag] = useState('')
   const [uniqueAuthors, setUniqueAuthors] = useState<string[]>([])
   const [uniqueTags, setUniqueTags] = useState<string[]>([])
+  const [editTagInput, setEditTagInput] = useState('')
+  const [createTagInput, setCreateTagInput] = useState('')
   
   // Estados para o modal de detalhes
   const [selectedPhrase, setSelectedPhrase] = useState<Phrase | null>(null)
@@ -234,6 +236,7 @@ export default function DashboardPage() {
       author: phrase.author,
       tags: phrase.tags || []
     })
+    setEditTagInput('')
     setIsModalOpen(true)
     setIsEditMode(false)
   }
@@ -242,6 +245,7 @@ export default function DashboardPage() {
     setIsModalOpen(false)
     setSelectedPhrase(null)
     setIsEditMode(false)
+    setEditTagInput('')
   }
 
   const handleEdit = () => {
@@ -336,6 +340,95 @@ export default function DashboardPage() {
     setTimeout(() => setShowAuthorSuggestions(false), 200)
   }
 
+  type TagMode = 'edit' | 'create'
+
+  const sanitizeTag = (tag: string) => tag.replace(/\s+/g, ' ').trim()
+
+  const addTag = (tag: string, mode: TagMode) => {
+    const sanitized = sanitizeTag(tag)
+    if (!sanitized) return
+
+    if (mode === 'edit') {
+      setEditFormData(prev => {
+        if (prev.tags.some(existing => existing.toLowerCase() === sanitized.toLowerCase())) {
+          return prev
+        }
+        return {
+          ...prev,
+          tags: [...prev.tags, sanitized]
+        }
+      })
+      setEditTagInput('')
+    } else {
+      setCreateFormData(prev => {
+        if (prev.tags.some(existing => existing.toLowerCase() === sanitized.toLowerCase())) {
+          return prev
+        }
+        return {
+          ...prev,
+          tags: [...prev.tags, sanitized]
+        }
+      })
+      setCreateTagInput('')
+    }
+  }
+
+  const removeTag = (tag: string, mode: TagMode) => {
+    if (mode === 'edit') {
+      setEditFormData(prev => ({
+        ...prev,
+        tags: prev.tags.filter(existing => existing !== tag)
+      }))
+    } else {
+      setCreateFormData(prev => ({
+        ...prev,
+        tags: prev.tags.filter(existing => existing !== tag)
+      }))
+    }
+  }
+
+  const handleTagKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    mode: TagMode
+  ) => {
+    const currentValue = mode === 'edit' ? editTagInput : createTagInput
+    const selectedTags = mode === 'edit' ? editFormData.tags : createFormData.tags
+
+    if (event.key === 'Enter' || event.key === ',') {
+      event.preventDefault()
+      addTag(currentValue, mode)
+    }
+
+    if (event.key === 'Backspace' && !currentValue) {
+      const lastTag = selectedTags[selectedTags.length - 1]
+      if (lastTag) {
+        event.preventDefault()
+        removeTag(lastTag, mode)
+      }
+    }
+  }
+
+  const getTagSuggestions = useCallback(
+    (inputValue: string, selectedTags: string[]) => {
+      const normalizedInput = inputValue.trim().toLowerCase()
+      return uniqueTags
+        .filter(tag => !selectedTags.some(selected => selected.toLowerCase() === tag.toLowerCase()))
+        .filter(tag => !normalizedInput || tag.toLowerCase().includes(normalizedInput))
+        .slice(0, 8)
+    },
+    [uniqueTags]
+  )
+
+  const editTagSuggestions = useMemo(
+    () => getTagSuggestions(editTagInput, editFormData.tags),
+    [editTagInput, editFormData.tags, getTagSuggestions]
+  )
+
+  const createTagSuggestions = useMemo(
+    () => getTagSuggestions(createTagInput, createFormData.tags),
+    [createTagInput, createFormData.tags, getTagSuggestions]
+  )
+
   // Funções do modal de criação
   const openCreateModal = () => {
     setCreateFormData({
@@ -345,6 +438,7 @@ export default function DashboardPage() {
     })
     setAuthorSuggestions([])
     setShowAuthorSuggestions(false)
+    setCreateTagInput('')
     setIsCreateModalOpen(true)
   }
 
@@ -357,6 +451,7 @@ export default function DashboardPage() {
     })
     setAuthorSuggestions([])
     setShowAuthorSuggestions(false)
+    setCreateTagInput('')
   }
 
   const handleCreatePhrase = async () => {
@@ -473,29 +568,39 @@ export default function DashboardPage() {
       <Navigation onAddClick={openCreateModal} />
 
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
+        
         {/* Input de pesquisa */}
         <div className={styles.searchContainer}>
-          <input 
-            type="text" 
-            placeholder="Pesquise aqui" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
-          />
-          <button 
-            onClick={openCreateModal}
-            className={styles.addButton}
-            title="Adicionar frase"
-          >
-            Adicionar frase
-          </button>
-          <button 
-            onClick={() => setIsFilterModalOpen(true)}
-            className={styles.filterButton}
-            title="Filtros"
-          >
-            <Filter size={18} />
-          </button>
+          <div className={styles.searchInputWrapper}>
+            <input 
+              type="text" 
+              placeholder="Pesquise aqui" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={styles.searchInput}
+            />
+            <Search className={styles.searchIcon} size={18} />
+          </div>
+          <div className={styles.searchActions}>
+            <button 
+              onClick={openCreateModal}
+              className={styles.addButton}
+              title="Adicionar frase"
+            >
+              Adicionar frase
+            </button>
+            <button 
+              onClick={() => setIsFilterModalOpen(true)}
+              className={styles.filterButton}
+              title="Filtros"
+            >
+              <Filter size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Lista de frases */}
@@ -511,16 +616,11 @@ export default function DashboardPage() {
           ) : (
             <>
               {phrases.map((phrase) => (
-                <div 
-                  key={phrase.id} 
-                  className={styles.phrasesCard}
+                <PhraseCard
+                  key={phrase.id}
+                  phrase={phrase}
                   onClick={() => openModal(phrase)}
-                >
-                  <div className={styles.phraseContent}>
-                    <p className={styles.phraseText}>&ldquo;{phrase.phrase}&rdquo;</p>
-                    <p className={styles.phraseAuthor}>— <span className={styles.phraseAuthorName}>{phrase.author}</span></p>
-                  </div>
-                </div>
+                />
               ))}
             </>
           )}
@@ -587,16 +687,59 @@ export default function DashboardPage() {
                   </div>
                   
                   <div className={styles.formGroup}>
-                    <label>Tags (separadas por vírgula):</label>
-                    <input
-                      type="text"
-                      value={editFormData.tags.join(', ')}
-                      onChange={(e) => setEditFormData({
-                        ...editFormData, 
-                        tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)
-                      })}
-                      className={styles.editInput}
-                    />
+                    <label>Tags:</label>
+                    <div className={styles.tagManager}>
+                      <div className={styles.tagInputRow}>
+                        <input
+                          type="text"
+                          value={editTagInput}
+                          onChange={(e) => setEditTagInput(e.target.value)}
+                          onKeyDown={(event) => handleTagKeyDown(event, 'edit')}
+                          className={styles.tagInputField}
+                          placeholder="Digite e pressione Enter"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => addTag(editTagInput, 'edit')}
+                          className={styles.tagAddButton}
+                        >
+                          Adicionar
+                        </button>
+                      </div>
+
+                      {editTagSuggestions.length > 0 && (
+                        <div className={styles.tagSuggestions}>
+                          {editTagSuggestions.map(tag => (
+                            <button
+                              key={tag}
+                              type="button"
+                              className={styles.tagSuggestionItem}
+                              onClick={() => addTag(tag, 'edit')}
+                            >
+                              {tag}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {editFormData.tags.length > 0 && (
+                        <div className={styles.selectedTags}>
+                          {editFormData.tags.map(tag => (
+                            <span key={tag} className={styles.tagChip}>
+                              {tag}
+                              <button
+                                type="button"
+                                className={styles.tagRemoveButton}
+                                onClick={() => removeTag(tag, 'edit')}
+                                aria-label={`Remover tag ${tag}`}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -733,17 +876,59 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className={styles.formGroup}>
-                  <label>Tags (separadas por vírgula):</label>
-                  <input
-                    type="text"
-                    value={createFormData.tags.join(', ')}
-                    onChange={(e) => setCreateFormData({
-                      ...createFormData, 
-                      tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag)
-                    })}
-                    className={styles.editInput}
-                    placeholder="motivação, inspiração, sucesso..."
-                  />
+                  <label>Tags:</label>
+                  <div className={styles.tagManager}>
+                    <div className={styles.tagInputRow}>
+                      <input
+                        type="text"
+                        value={createTagInput}
+                        onChange={(e) => setCreateTagInput(e.target.value)}
+                        onKeyDown={(event) => handleTagKeyDown(event, 'create')}
+                        className={styles.tagInputField}
+                        placeholder="Digite e pressione Enter"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => addTag(createTagInput, 'create')}
+                        className={styles.tagAddButton}
+                      >
+                        Adicionar
+                      </button>
+                    </div>
+
+                    {createTagSuggestions.length > 0 && (
+                      <div className={styles.tagSuggestions}>
+                        {createTagSuggestions.map(tag => (
+                          <button
+                            key={tag}
+                            type="button"
+                            className={styles.tagSuggestionItem}
+                            onClick={() => addTag(tag, 'create')}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {createFormData.tags.length > 0 && (
+                      <div className={styles.selectedTags}>
+                        {createFormData.tags.map(tag => (
+                          <span key={tag} className={styles.tagChip}>
+                            {tag}
+                            <button
+                              type="button"
+                              className={styles.tagRemoveButton}
+                              onClick={() => removeTag(tag, 'create')}
+                              aria-label={`Remover tag ${tag}`}
+                            >
+                              ×
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -90,7 +90,7 @@ class ApiClient {
     return response.json()
   }
 
-  async put(endpoint: string, data: PhraseUpdateData) {
+  async put(endpoint: string, data: PhraseUpdateData | UpdateProfileData) {
     const headers = await this.getAuthHeaders()
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -154,6 +154,15 @@ export interface PhraseFilters {
   [key: string]: string | number | undefined
 }
 
+// Interface para frase com informações do usuário (usado no feed)
+export interface PhraseWithUser extends Phrase {
+  user: {
+    id: string;
+    name: string | null;
+    username: string;
+  };
+}
+
 // Funções específicas para frases
 export const frasesAPI = {
   listar: (filters?: PhraseFilters) => apiClient.get('/phrases', filters),
@@ -167,6 +176,9 @@ export const frasesAPI = {
     apiClient.get('/phrases/filters/authors', userId ? { userId } : undefined),
   buscarTagsUnicas: (userId?: string): Promise<string[]> => 
     apiClient.get('/phrases/filters/tags', userId ? { userId } : undefined),
+  // Feed de frases
+  getFeed: (page?: number, limit?: number): Promise<{ phrases: PhraseWithUser[]; pagination: { page: number; limit: number; total: number; pages: number } }> => 
+    apiClient.get('/phrases/feed', { page, limit }),
 }
 
 export interface Phrase {
@@ -202,7 +214,72 @@ export interface PhraseResponse {
   };
 }
 
+// Interfaces para Profile
+export interface UpdateProfileData {
+  avatar?: string | null;
+  bio?: string | null;
+}
 
+export interface Profile {
+  id: string;
+  avatar: string | null;
+  bio: string | null;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  followersCount: number;
+  followingCount: number;
+  user: {
+    id: string;
+    name: string | null;
+    username: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  };
+}
+
+// Interface para o relatório mensal
+export interface MonthlyReport {
+  phrasesCreated: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+  phrasesMemorized: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+  newFollowers: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+  likes: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+}
+
+// Funções específicas para Profile
+export const profileAPI = {
+  getMyProfile: (): Promise<Profile> => apiClient.get('/profile/me'),
+  getByUserId: (userId: string): Promise<Profile> => apiClient.get(`/profile/user/${userId}`),
+  getById: (id: string): Promise<Profile> => apiClient.get(`/profile/${id}`),
+  update: (data: UpdateProfileData): Promise<{ message: string; profile: Profile }> => 
+    apiClient.put('/profile/me', data),
+  create: (data: UpdateProfileData): Promise<{ message: string; profile: Profile }> => 
+    apiClient.post('/profile', data),
+  getFollowers: (userId: string): Promise<any[]> => apiClient.get(`/profile/user/${userId}/followers`),
+  getFollowing: (userId: string): Promise<any[]> => apiClient.get(`/profile/user/${userId}/following`),
+  follow: (followingUserId: string): Promise<{ message: string }> => 
+    apiClient.post('/profile/follow', { followingUserId }),
+  unfollow: (followingUserId: string): Promise<{ message: string }> => 
+    apiClient.post('/profile/unfollow', { followingUserId }),
+  getMonthlyReport: (): Promise<MonthlyReport> => apiClient.get('/profile/me/monthly-report'),
+}
 
 // Exemplo de uso:
 // import { frasesAPI } from '@/lib/api'

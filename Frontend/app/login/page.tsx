@@ -33,7 +33,7 @@ export default function LoginPage() {
         setError('Email ou senha incorretos')
       } else {
         // Login bem-sucedido
-        router.push('/dashboard')
+        router.push('/phrases')
         router.refresh()
       }
     } catch {
@@ -49,7 +49,7 @@ export default function LoginPage() {
 
     try {
       await signIn('google', {
-        callbackUrl: '/dashboard',
+        callbackUrl: '/phrases',
       })
       // Nota: Não resetamos isLoadingGoogle aqui porque o signIn do Google
       // redireciona para o Google, então o componente será desmontado

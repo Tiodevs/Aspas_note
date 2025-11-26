@@ -95,7 +95,7 @@ export default function Home() {
             <motion.div variants={itemVariants}>
               <Link
                 className={styles.ctaButton}
-                href={isAuthenticated ? '/dashboard' : '/signup'}
+                href={isAuthenticated ? '/phrases' : '/signup'}
               >
                 Começar agora
               </Link>

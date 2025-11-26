@@ -248,4 +248,41 @@ export class PhrasesController {
             });
         }
     }
+
+    // Buscar feed de frases (frases das pessoas que o usuário segue)
+    getFeed = async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user?.userId;
+            
+            if (!userId) {
+                res.status(401).json({
+                    error: 'Token inválido ou expirado',
+                    code: 'INVALID_TOKEN'
+                });
+                return;
+            }
+
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 20;
+
+            const result = await phrasesService.getFeedPhrases(userId, page, limit);
+
+            res.json(result);
+        } catch (error: any) {
+            console.error('Erro ao buscar feed:', error);
+            
+            if (error.message === 'Perfil não encontrado') {
+                res.status(404).json({
+                    error: 'Perfil não encontrado',
+                    code: 'PROFILE_NOT_FOUND'
+                });
+                return;
+            }
+
+            res.status(500).json({
+                error: 'Erro interno do servidor',
+                code: 'INTERNAL_ERROR'
+            });
+        }
+    }
 }

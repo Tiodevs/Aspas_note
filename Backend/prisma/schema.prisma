@@ -19,8 +19,6 @@ model User {
   email     String   @unique
   name      String?
   username  String   @unique
-  avatar    String?
-  bio       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   updatedBy String?
@@ -29,6 +27,9 @@ model User {
   
   // Relacionamento com frases
   phrases   Phrase[]
+  
+  // Relacionamento 1:1 com Profile
+  profile   Profile?
   
   @@map("users")
 }
@@ -46,6 +47,39 @@ model Phrase {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("phrases")
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  avatar    String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relacionamento 1:1 com User
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relacionamentos de seguidores/seguindo
+  followers Follow[] @relation("Follower")
+  following Follow[] @relation("Following")
+  
+  @@map("profiles")
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  
+  // Relacionamentos
+  follower    Profile  @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   Profile  @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  
+  // Garantir que não pode seguir a si mesmo e não pode seguir duas vezes
+  @@unique([followerId, followingId])
+  @@map("follows")
 }
 
 model PasswordReset {

@@ -118,6 +118,20 @@ export class AuthService {
                 }
             });
 
+            // Criar perfil automaticamente para o novo usuário
+            try {
+                await prisma.profile.create({
+                    data: {
+                        userId: user.id,
+                        avatar: null,
+                        bio: null
+                    }
+                });
+            } catch (profileError) {
+                // Se falhar ao criar perfil, loga o erro mas não falha a criação do usuário
+                console.error('Erro ao criar perfil automaticamente:', profileError);
+            }
+
             // Envio do email de boas-vindas de forma assíncrona
             this.emailService.enviarEmailBoasVindas(username, email)
                     .then(result => {
@@ -254,21 +268,58 @@ export class AuthService {
                         email,
                         name,
                         username,
-                        avatar: image || '',
-                        bio: '',
                         password: '', // OAuth users não precisam de senha
                         role: Role.FREE
                     }
                 });
+
+                // Criar perfil automaticamente com avatar do OAuth
+                try {
+                    await prisma.profile.create({
+                        data: {
+                            userId: usuario.id,
+                            avatar: image || null,
+                            bio: null
+                        }
+                    });
+                } catch (profileError) {
+                    console.error('Erro ao criar perfil automaticamente no OAuth:', profileError);
+                }
             } else {
                 // Se o usuário já existe, atualizar informações se necessário
                 usuario = await prisma.user.update({
                     where: { id: usuario.id },
                     data: {
-                        name, // Atualizar nome se mudou
-                        avatar: image || usuario.avatar // Atualizar avatar se fornecido
+                        name // Atualizar nome se mudou
                     }
                 });
+
+                // Atualizar avatar no perfil se fornecido
+                if (image) {
+                    try {
+                        const existingProfile = await prisma.profile.findUnique({
+                            where: { userId: usuario.id }
+                        });
+
+                        if (existingProfile) {
+                            await prisma.profile.update({
+                                where: { userId: usuario.id },
+                                data: { avatar: image }
+                            });
+                        } else {
+                            // Se não tem perfil, criar um
+                            await prisma.profile.create({
+                                data: {
+                                    userId: usuario.id,
+                                    avatar: image,
+                                    bio: null
+                                }
+                            });
+                        }
+                    } catch (profileError) {
+                        console.error('Erro ao atualizar perfil no OAuth:', profileError);
+                    }
+                }
             }
 
             // Criar o token JWT
@@ -286,6 +337,18 @@ export class AuthService {
                 throw new Error('Erro ao gerar token');
             }
 
+            // Buscar perfil para incluir avatar
+            let avatar = null;
+            try {
+                const profile = await prisma.profile.findUnique({
+                    where: { userId: usuario.id },
+                    select: { avatar: true }
+                });
+                avatar = profile?.avatar || null;
+            } catch (profileError) {
+                console.error('Erro ao buscar perfil no OAuth:', profileError);
+            }
+
             // Retornar token e informações do usuário
             return {
                 token,
@@ -294,7 +357,7 @@ export class AuthService {
                     nome: usuario.name,
                     email: usuario.email,
                     role: usuario.role,
-                    avatar: usuario.avatar
+                    avatar: avatar
                 }
             };
         } catch (error) {
@@ -306,7 +369,7 @@ export class AuthService {
         }
     }
 
-    // Obter dados do usuário por ID
+    // Obter dados do usuário por ID (mantém retrocompatibilidade)
     async getUserById(userId: string) {
         try {
             const user = await prisma.user.findUnique({
@@ -316,7 +379,21 @@ export class AuthService {
                     name: true,
                     email: true,
                     role: true,
-                    createdAt: true
+                    createdAt: true,
+                    username: true,
+                    profile: {
+                        select: {
+                            id: true,
+                            avatar: true,
+                            bio: true,
+                            _count: {
+                                select: {
+                                    followers: true,
+                                    following: true
+                                }
+                            }
+                        }
+                    }
                 }
             });
 
@@ -324,7 +401,26 @@ export class AuthService {
                 throw new Error('Usuário não encontrado');
             }
 
-            return user;
+            // Retornar formato compatível com código antigo (incluindo avatar e bio)
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                createdAt: user.createdAt,
+                username: user.username,
+                // Mantém retrocompatibilidade: inclui avatar e bio mesmo que venham do profile
+                avatar: user.profile?.avatar || null,
+                bio: user.profile?.bio || null,
+                // Inclui dados do profile se existir
+                profile: user.profile ? {
+                    id: user.profile.id,
+                    avatar: user.profile.avatar,
+                    bio: user.profile.bio,
+                    followersCount: user.profile._count.followers,
+                    followingCount: user.profile._count.following
+                } : null
+            };
         } catch (error) {
             console.error('Erro ao buscar usuário por ID:', error);
             if (error instanceof Error) {
