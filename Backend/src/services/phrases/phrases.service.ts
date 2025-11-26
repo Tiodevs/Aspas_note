@@ -236,4 +236,112 @@ export class PhrasesService {
 
         return uniqueTags;
     }
+
+    // Buscar frases do feed (frases das pessoas que o usuário segue)
+    async getFeedPhrases(userId: string, page: number = 1, limit: number = 20) {
+        try {
+            // Buscar o perfil do usuário
+            const userProfile = await prisma.profile.findUnique({
+                where: { userId }
+            });
+
+            if (!userProfile) {
+                throw new Error('Perfil não encontrado');
+            }
+
+            // Buscar os IDs dos perfis que o usuário está seguindo
+            const following = await prisma.follow.findMany({
+                where: {
+                    followerId: userProfile.id
+                },
+                select: {
+                    followingId: true
+                }
+            });
+
+            const followingProfileIds = following.map(f => f.followingId);
+
+            // Se não está seguindo ninguém, retornar array vazio
+            if (followingProfileIds.length === 0) {
+                return {
+                    phrases: [],
+                    pagination: {
+                        page,
+                        limit,
+                        total: 0,
+                        pages: 0
+                    }
+                };
+            }
+
+            // Buscar os userIds dos perfis que está seguindo
+            const followingProfiles = await prisma.profile.findMany({
+                where: {
+                    id: {
+                        in: followingProfileIds
+                    }
+                },
+                select: {
+                    userId: true
+                }
+            });
+
+            const followingUserIds = followingProfiles.map(p => p.userId);
+
+            // Buscar frases desses usuários, ordenadas por data de criação (mais recentes primeiro)
+            const skip = (page - 1) * limit;
+
+            const [phrases, total] = await Promise.all([
+                prisma.phrase.findMany({
+                    where: {
+                        userId: {
+                            in: followingUserIds
+                        }
+                    },
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                name: true,
+                                username: true
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createdAt: 'desc'
+                    },
+                    skip,
+                    take: limit
+                }),
+                prisma.phrase.count({
+                    where: {
+                        userId: {
+                            in: followingUserIds
+                        }
+                    }
+                })
+            ]);
+
+            const pages = Math.ceil(total / limit);
+
+            return {
+                phrases: phrases.map(phrase => ({
+                    ...phrase,
+                    user: phrase.user
+                })),
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    pages
+                }
+            };
+        } catch (error) {
+            console.error('Erro ao buscar frases do feed:', error);
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error('Erro ao buscar frases do feed');
+        }
+    }
 }

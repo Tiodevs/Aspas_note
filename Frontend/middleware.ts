@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth"
 import { NextRequest, NextResponse } from "next/server"
 
 // Rotas que requerem autenticação
-const protectedRoutes = ['/phrases', '/profile', '/settings']
+const protectedRoutes = ['/phrases', '/profile', '/settings', '/feed']
 
 // Rotas que só usuários não autenticados podem acessar
 const authRoutes = ['/login', '/signup']

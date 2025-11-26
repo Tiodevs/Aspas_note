@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import styles from './page.module.css'
-import { Navigation, Logo } from '@/components/ui'
+import { Navigation, Logo, PhraseCard } from '@/components/ui'
 import { frasesAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData } from '@/lib/api'
 import { Edit, Trash2, X, Filter, Plus, Search } from 'lucide-react'
 
@@ -616,16 +616,11 @@ export default function DashboardPage() {
           ) : (
             <>
               {phrases.map((phrase) => (
-                <div 
-                  key={phrase.id} 
-                  className={styles.phrasesCard}
+                <PhraseCard
+                  key={phrase.id}
+                  phrase={phrase}
                   onClick={() => openModal(phrase)}
-                >
-                  <div className={styles.phraseContent}>
-                    <p className={styles.phraseText}>&ldquo;{phrase.phrase}&rdquo;</p>
-                    <p className={styles.phraseAuthor}>— <span className={styles.phraseAuthorName}>{phrase.author}</span></p>
-                  </div>
-                </div>
+                />
               ))}
             </>
           )}
