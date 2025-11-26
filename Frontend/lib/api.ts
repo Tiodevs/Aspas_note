@@ -227,6 +227,30 @@ export interface Profile {
   };
 }
 
+// Interface para o relatório mensal
+export interface MonthlyReport {
+  phrasesCreated: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+  phrasesMemorized: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+  newFollowers: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+  likes: {
+    current: number;
+    previous: number;
+    change: number;
+  };
+}
+
 // Funções específicas para Profile
 export const profileAPI = {
   getMyProfile: (): Promise<Profile> => apiClient.get('/profile/me'),
@@ -242,6 +266,7 @@ export const profileAPI = {
     apiClient.post('/profile/follow', { followingUserId }),
   unfollow: (followingUserId: string): Promise<{ message: string }> => 
     apiClient.post('/profile/unfollow', { followingUserId }),
+  getMonthlyReport: (): Promise<MonthlyReport> => apiClient.get('/profile/me/monthly-report'),
 }
 
 // Exemplo de uso:

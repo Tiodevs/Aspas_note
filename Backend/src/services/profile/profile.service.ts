@@ -400,5 +400,115 @@ export class ProfileService {
             throw new Error('Erro ao listar seguindo');
         }
     }
+
+    // Buscar relatório mensal
+    async getMonthlyReport(userId: string) {
+        try {
+            const now = new Date();
+            const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+            const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+
+            // Buscar perfil para acessar seguidores
+            const profile = await prisma.profile.findUnique({
+                where: { userId }
+            });
+
+            if (!profile) {
+                throw new Error('Perfil não encontrado');
+            }
+
+            // Frases criadas este mês
+            const phrasesThisMonth = await prisma.phrase.count({
+                where: {
+                    userId,
+                    createdAt: {
+                        gte: startOfCurrentMonth
+                    }
+                }
+            });
+
+            // Frases criadas no mês anterior
+            const phrasesLastMonth = await prisma.phrase.count({
+                where: {
+                    userId,
+                    createdAt: {
+                        gte: startOfLastMonth,
+                        lt: startOfCurrentMonth
+                    }
+                }
+            });
+
+            // Calcular percentual de mudança para frases criadas
+            const phrasesChange = phrasesLastMonth > 0
+                ? ((phrasesThisMonth - phrasesLastMonth) / phrasesLastMonth) * 100
+                : phrasesThisMonth > 0 ? 100 : 0;
+
+            // Novos seguidores este mês
+            const followersThisMonth = await prisma.follow.count({
+                where: {
+                    followingId: profile.id,
+                    createdAt: {
+                        gte: startOfCurrentMonth
+                    }
+                }
+            });
+
+            // Novos seguidores no mês anterior
+            const followersLastMonth = await prisma.follow.count({
+                where: {
+                    followingId: profile.id,
+                    createdAt: {
+                        gte: startOfLastMonth,
+                        lt: startOfCurrentMonth
+                    }
+                }
+            });
+
+            // Calcular percentual de mudança para seguidores
+            const followersChange = followersLastMonth > 0
+                ? ((followersThisMonth - followersLastMonth) / followersLastMonth) * 100
+                : followersThisMonth > 0 ? 100 : 0;
+
+            // Frases decoradas - por enquanto retornar 0 (não há modelo ainda)
+            const memorizedPhrases = 0;
+            const memorizedPhrasesLastMonth = 0;
+            const memorizedChange = 0;
+
+            // Curtidas - por enquanto retornar 0 (não há modelo ainda)
+            const likes = 0;
+            const likesLastMonth = 0;
+            const likesChange = 0;
+
+            return {
+                phrasesCreated: {
+                    current: phrasesThisMonth,
+                    previous: phrasesLastMonth,
+                    change: phrasesChange
+                },
+                phrasesMemorized: {
+                    current: memorizedPhrases,
+                    previous: memorizedPhrasesLastMonth,
+                    change: memorizedChange
+                },
+                newFollowers: {
+                    current: followersThisMonth,
+                    previous: followersLastMonth,
+                    change: followersChange
+                },
+                likes: {
+                    current: likes,
+                    previous: likesLastMonth,
+                    change: likesChange
+                }
+            };
+        } catch (error) {
+            console.error('Erro ao buscar relatório mensal:', error);
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error('Erro ao buscar relatório mensal');
+        }
+    }
 }
 
