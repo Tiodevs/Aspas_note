@@ -174,7 +174,6 @@ export default function ProfilePage() {
             className={styles.settingsButton}
             onClick={handleSettingsClick}
           >
-            <Settings size={20} />
             <span>Configurações</span>
           </button>
           
@@ -182,7 +181,6 @@ export default function ProfilePage() {
             className={styles.logoutButton}
             onClick={handleSignOut}
           >
-            <LogOut size={20} />
             <span>Sair da Conta</span>
           </button>
         </div>

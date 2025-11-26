@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Logo } from './Logo'
 import styles from './Navigation.module.css'
 import { signOut } from 'next-auth/react'
-import { Github, LogIn, Home, User, LogOut, Plus, Brain } from 'lucide-react'
+import { Github, LogIn, Home, User, LogOut, Plus, Brain, BookOpen, NotebookIcon } from 'lucide-react'
 
 interface NavigationProps {
   onAddClick?: () => void
@@ -65,11 +65,18 @@ export default function Navigation({ onAddClick }: NavigationProps) {
           {isAuthenticated && (
             <>
               <Link
-                className={`${styles.navIcon} ${pathname === '/dashboard' ? styles.navIconActive : ''}`}
-                title="Home"
-                href="/dashboard"
+                className={`${styles.navIcon} ${pathname === '/feed' ? styles.navIconActive : ''}`}
+                title="feed"
+                href="/feed"
               >
                 <Home size={20} />
+              </Link>
+              <Link
+                className={`${styles.navIcon} ${pathname === '/phrases' ? styles.navIconActive : ''}`}
+                title="Phrases"
+                href="/phrases"
+              >
+                <NotebookIcon size={20} />
               </Link>
               <Link
                 className={`${styles.navIcon} ${pathname === '/games' ? styles.navIconActive : ''}`}

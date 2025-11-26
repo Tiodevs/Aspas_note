@@ -90,7 +90,7 @@
 
 .settingsButton {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 12px 24px;
   background: rgba(20, 20, 20, 0.6);
@@ -101,7 +101,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .settingsButton:hover {
@@ -115,7 +115,7 @@
 
 .logoutButton {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 12px 24px;
   background: rgba(20, 20, 20, 0.6);
@@ -126,14 +126,13 @@
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .logoutButton:hover {
   background: rgba(239, 68, 68, 0.1);
   border-color: #ef4444;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
 .logoutButton:active {
@@ -164,12 +163,12 @@
   border-radius: 12px;
   padding: 20px;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .reportCard:hover {
   border-color: rgba(0, 255, 204, 0.3);
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 255, 204, 0.15);
 }
 
 .reportCardHeader {
