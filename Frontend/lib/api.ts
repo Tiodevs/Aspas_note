@@ -154,6 +154,15 @@ export interface PhraseFilters {
   [key: string]: string | number | undefined
 }
 
+// Interface para frase com informações do usuário (usado no feed)
+export interface PhraseWithUser extends Phrase {
+  user: {
+    id: string;
+    name: string | null;
+    username: string;
+  };
+}
+
 // Funções específicas para frases
 export const frasesAPI = {
   listar: (filters?: PhraseFilters) => apiClient.get('/phrases', filters),
@@ -167,6 +176,9 @@ export const frasesAPI = {
     apiClient.get('/phrases/filters/authors', userId ? { userId } : undefined),
   buscarTagsUnicas: (userId?: string): Promise<string[]> => 
     apiClient.get('/phrases/filters/tags', userId ? { userId } : undefined),
+  // Feed de frases
+  getFeed: (page?: number, limit?: number): Promise<{ phrases: PhraseWithUser[]; pagination: { page: number; limit: number; total: number; pages: number } }> => 
+    apiClient.get('/phrases/feed', { page, limit }),
 }
 
 export interface Phrase {

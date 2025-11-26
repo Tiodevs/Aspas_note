@@ -1,0 +1,115 @@
+/* Base do card - mantém o padrão do phrases */
+.phrasesCard {
+  width: 48.5%;
+  min-height: 90px;
+  max-height: fit-content;
+  margin-bottom: 3%;
+  background: var(--color-background2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.phrasesCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.phraseContent {
+  flex: 1;
+  width: 100%;
+}
+
+.phraseText {
+  color: var(--color-white);
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.phraseAuthor {
+  color: var(--color-primary);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.phraseAuthorName {
+  color: var(--color-subtitle);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Footer para metadata e ações */
+.cardFooter {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.cardMetadata {
+  flex: 1;
+}
+
+.userLink {
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.userLink:hover {
+  opacity: 0.8;
+}
+
+.metadataText {
+  font-size: 0.875rem;
+  color: var(--color-subtitle);
+  opacity: 0.8;
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.actionButton {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.actionButton:hover {
+  background: rgba(1, 222, 178, 0.1);
+  color: var(--color-primary);
+}
+
+.actionButton:active {
+  transform: scale(0.95);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .phrasesCard {
+    width: 100%;
+    margin-bottom: 1.5rem;
+  }
+}
+
