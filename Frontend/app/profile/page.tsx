@@ -4,10 +4,17 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Navigation, Logo } from '@/components/ui'
-import { profileAPI, Profile, frasesAPI } from '@/lib/api'
+import { profileAPI, Profile, frasesAPI, MonthlyReport } from '@/lib/api'
 import { Settings, ArrowUp, ArrowDown, LogOut } from 'lucide-react'
 import styles from './page.module.css'
 import { LucideUser } from 'lucide-react'
+
+interface MonthlyReportItem {
+  title: string;
+  value: number;
+  change: string;
+  isPositive: boolean;
+}
 
 export default function ProfilePage() {
   const { data: session, status } = useSession()
@@ -16,40 +23,49 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [phrasesCount, setPhrasesCount] = useState(0)
-
-  // Dados mockados para o relatório mensal
-  const monthlyReport = [
-    {
-      title: 'Frases criadas',
-      value: 102,
-      change: '+11.01%',
-      isPositive: true
-    },
-    {
-      title: 'Frases decoradas',
-      value: 30,
-      change: '+6%',
-      isPositive: false
-    },
-    {
-      title: 'Novos seguidores',
-      value: 500,
-      change: '+100%',
-      isPositive: true
-    },
-    {
-      title: 'Curtidas',
-      value: 1000,
-      change: '+10%',
-      isPositive: true
-    }
-  ]
+  const [monthlyReport, setMonthlyReport] = useState<MonthlyReportItem[]>([])
+  const [reportLoading, setReportLoading] = useState(true)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login')
     }
   }, [status, router])
+
+  // Função para formatar o relatório mensal
+  const formatMonthlyReport = (report: MonthlyReport): MonthlyReportItem[] => {
+    const formatChange = (change: number): string => {
+      const sign = change >= 0 ? '+' : ''
+      return `${sign}${change.toFixed(2)}%`
+    }
+
+    return [
+      {
+        title: 'Frases criadas',
+        value: report.phrasesCreated.current,
+        change: formatChange(report.phrasesCreated.change),
+        isPositive: report.phrasesCreated.change >= 0
+      },
+      {
+        title: 'Frases decoradas',
+        value: report.phrasesMemorized.current,
+        change: formatChange(report.phrasesMemorized.change),
+        isPositive: report.phrasesMemorized.change >= 0
+      },
+      {
+        title: 'Novos seguidores',
+        value: report.newFollowers.current,
+        change: formatChange(report.newFollowers.change),
+        isPositive: report.newFollowers.change >= 0
+      },
+      {
+        title: 'Curtidas',
+        value: report.likes.current,
+        change: formatChange(report.likes.change),
+        isPositive: report.likes.change >= 0
+      }
+    ]
+  }
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -74,6 +90,44 @@ export default function ProfilePage() {
           console.error('Erro ao buscar contagem de frases:', phrasesErr)
           // Se falhar, usar valor padrão
           setPhrasesCount(0)
+        }
+
+        // Buscar relatório mensal
+        try {
+          setReportLoading(true)
+          const report = await profileAPI.getMonthlyReport()
+          setMonthlyReport(formatMonthlyReport(report))
+        } catch (reportErr) {
+          console.error('Erro ao buscar relatório mensal:', reportErr)
+          // Se falhar, usar valores padrão
+          setMonthlyReport([
+            {
+              title: 'Frases criadas',
+              value: 0,
+              change: '0%',
+              isPositive: true
+            },
+            {
+              title: 'Frases decoradas',
+              value: 0,
+              change: '0%',
+              isPositive: true
+            },
+            {
+              title: 'Novos seguidores',
+              value: 0,
+              change: '0%',
+              isPositive: true
+            },
+            {
+              title: 'Curtidas',
+              value: 0,
+              change: '0%',
+              isPositive: true
+            }
+          ])
+        } finally {
+          setReportLoading(false)
         }
       } catch (err) {
         console.error('Erro ao carregar perfil:', err)

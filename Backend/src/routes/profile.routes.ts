@@ -14,6 +14,9 @@ router.post('/', authenticateToken, validate(createProfileSchema), profileContro
 // Buscar perfil do usuário atual
 router.get('/me', authenticateToken, profileController.getMyProfile);
 
+// Buscar relatório mensal do usuário atual
+router.get('/me/monthly-report', authenticateToken, profileController.getMonthlyReport);
+
 // Atualizar perfil do usuário atual
 router.put('/me', authenticateToken, validate(updateProfileSchema), profileController.update);
 

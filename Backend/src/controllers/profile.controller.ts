@@ -358,5 +358,39 @@ export class ProfileController {
             });
         }
     }
+
+    // Buscar relatório mensal
+    getMonthlyReport = async (req: Request, res: Response) => {
+        try {
+            const userId = (req as any).user?.userId;
+            
+            if (!userId) {
+                res.status(401).json({
+                    error: 'Token inválido ou expirado',
+                    code: 'INVALID_TOKEN'
+                });
+                return;
+            }
+
+            const report = await profileService.getMonthlyReport(userId);
+
+            res.json(report);
+        } catch (error: any) {
+            console.error('Erro ao buscar relatório mensal:', error);
+            
+            if (error.message === 'Perfil não encontrado') {
+                res.status(404).json({
+                    error: 'Perfil não encontrado',
+                    code: 'PROFILE_NOT_FOUND'
+                });
+                return;
+            }
+
+            res.status(500).json({
+                error: 'Erro interno do servidor',
+                code: 'INTERNAL_ERROR'
+            });
+        }
+    }
 }
 
