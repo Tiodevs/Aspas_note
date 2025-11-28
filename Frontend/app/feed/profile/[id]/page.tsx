@@ -30,34 +30,25 @@ export default function PublicProfilePage() {
 
   // Verificar se está seguindo o usuário
   const checkFollowingStatus = useCallback(async () => {
-    if (!session?.user?.id || !userId) {
+    if (!session?.user?.id || !profile?.id) {
       setIsFollowing(false)
       return
     }
 
     try {
-      const following = await profileAPI.getFollowing(session.user.id)
+      const following = await profileAPI.getFollowers(userId)
+      console.log('following', following)
       
-      // following é um array de objetos com userId
-      // Verificar se algum dos perfis seguidos tem o userId igual ao userId do perfil atual
-      const isFollowingUser = Array.isArray(following) && following.some(
-        (followed: any) => {
-          // Converter para string para garantir comparação correta
-          const followedUserId = String(followed.userId || '')
-          const followedUserFromUser = String(followed.user?.id || '')
-          const targetUserId = String(userId)
-          
-          // Comparar tanto userId quanto user.id para garantir
-          return followedUserId === targetUserId || followedUserFromUser === targetUserId
+      following.forEach((follower: any) => {
+        if (follower.userId === userId) {
+          setIsFollowing(true)
         }
-      )
-      
-      setIsFollowing(!!isFollowingUser)
+      })
     } catch (error) {
       console.error('Erro ao verificar status de seguir:', error)
       setIsFollowing(false)
     }
-  }, [session?.user?.id, userId])
+  }, [session?.user?.id, profile?.id])
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -84,8 +75,8 @@ export default function PublicProfilePage() {
           setPhrasesCount(0)
         }
 
-        // Verificar se está seguindo
-        await checkFollowingStatus()
+        // Verificar se está seguindo (após carregar o profile)
+        // checkFollowingStatus será chamado quando profile mudar
       } catch (err: any) {
         console.error('Erro ao carregar perfil:', err)
         if (err.message?.includes('404') || err.message?.includes('não encontrado')) {
@@ -103,6 +94,14 @@ export default function PublicProfilePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, userId, session?.user?.id])
+
+  // Verificar status de seguir quando o profile for carregado
+  useEffect(() => {
+    if (profile?.id) {
+      checkFollowingStatus()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id])
 
   const handleFollow = async () => {
     if (!session?.user?.id || !userId || isFollowingLoading) return
