@@ -58,6 +58,18 @@ export class AuthService {
                 throw new Error('Erro ao gerar token');
             }
 
+            // Buscar perfil para incluir profileId
+            let profileId = null;
+            try {
+                const profile = await prisma.profile.findUnique({
+                    where: { userId: usuario.id },
+                    select: { id: true }
+                });
+                profileId = profile?.id || null;
+            } catch (profileError) {
+                console.error('Erro ao buscar perfil no login:', profileError);
+            }
+
             // Retorna o token e informações básicas do usuário
             return {
                 token,
@@ -65,7 +77,8 @@ export class AuthService {
                     id: usuario.id,
                     nome: usuario.name,
                     email: usuario.email,
-                    role: usuario.role
+                    role: usuario.role,
+                    profileId: profileId
                 }
             };
         } catch (error) {
@@ -337,14 +350,16 @@ export class AuthService {
                 throw new Error('Erro ao gerar token');
             }
 
-            // Buscar perfil para incluir avatar
+            // Buscar perfil para incluir avatar e profileId
             let avatar = null;
+            let profileId = null;
             try {
                 const profile = await prisma.profile.findUnique({
                     where: { userId: usuario.id },
-                    select: { avatar: true }
+                    select: { id: true, avatar: true }
                 });
                 avatar = profile?.avatar || null;
+                profileId = profile?.id || null;
             } catch (profileError) {
                 console.error('Erro ao buscar perfil no OAuth:', profileError);
             }
@@ -357,7 +372,8 @@ export class AuthService {
                     nome: usuario.name,
                     email: usuario.email,
                     role: usuario.role,
-                    avatar: avatar
+                    avatar: avatar,
+                    profileId: profileId
                 }
             };
         } catch (error) {

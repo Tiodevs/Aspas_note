@@ -65,7 +65,7 @@ export default function Navigation({ onAddClick }: NavigationProps) {
           {isAuthenticated && (
             <>
               <Link
-                className={`${styles.navIcon} ${pathname === '/feed' ? styles.navIconActive : ''}`}
+                className={`${styles.navIcon} ${pathname.startsWith('/feed') ? styles.navIconActive : ''}`}
                 title="feed"
                 href="/feed"
               >

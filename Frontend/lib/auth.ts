@@ -99,7 +99,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               name: data.user.nome,
               role: data.user.role,
               accessToken: data.token,
-              provider: 'credentials'
+              provider: 'credentials',
+              profileId: data.user.profileId || null
             }
           }
 
@@ -203,6 +204,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             user.role = data.user?.role || 'FREE'
             user.accessToken = data.token
             user.provider = 'google'
+            user.profileId = data.user?.profileId || null
             return true
           } else {
             // Se a resposta não for ok, tentar ler o erro
@@ -253,6 +255,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.accessToken = user.accessToken
         token.role = user.role || 'FREE'
         token.provider = user.provider || account?.provider || 'credentials'
+        token.profileId = user.profileId || null
       }
       return token
     },
@@ -264,6 +267,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.role = token.role as string
         session.accessToken = token.accessToken as string
         session.provider = token.provider as string
+        session.profileId = (token.profileId as string | null) || null
       }
       return session
     }
@@ -284,6 +288,7 @@ declare module "next-auth" {
     role: string
     accessToken: string
     provider: string
+    profileId?: string | null
   }
 
   interface Session {
@@ -296,5 +301,6 @@ declare module "next-auth" {
     }
     accessToken: string
     provider: string
+    profileId: string | null
   }
 }
