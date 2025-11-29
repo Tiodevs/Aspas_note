@@ -21,8 +21,6 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
-    # Desabilita logs do MongoDB no console (reduz poluição visual)
-    # Os logs ainda estarão disponíveis via: docker logs aspas_note_mongo
     logging:
       driver: "none"
     restart: unless-stopped

@@ -57,9 +57,15 @@ class ApiClient {
 
     if (!response.ok) {
       let errorMessage = `Erro na API: ${response.status}`
+      let errorCode: string | undefined
       try {
         const errorData = await response.json()
         console.error('Detalhes do erro da API POST:', errorData)
+        
+        // Capturar o código de erro se existir
+        if (errorData.code) {
+          errorCode = errorData.code
+        }
         
         if (errorData.error) {
           errorMessage += ` - ${errorData.error}`
@@ -84,7 +90,11 @@ class ApiClient {
       } catch (e) {
         console.error('Erro ao fazer parse do JSON de erro:', e)
       }
-      throw new Error(errorMessage)
+      
+      const error = new Error(errorMessage) as Error & { code?: string; status?: number }
+      error.code = errorCode
+      error.status = response.status
+      throw error
     }
 
     return response.json()
