@@ -105,6 +105,73 @@
   transform: scale(0.95);
 }
 
+/* Menu de compartilhamento */
+.shareContainer {
+  position: relative;
+}
+
+.shareMenu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.5rem;
+  background: var(--color-background2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 0.5rem;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shareMenuItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.shareMenuItem:hover {
+  background: rgba(1, 222, 178, 0.1);
+  color: var(--color-primary);
+}
+
+.shareMenuItem:active {
+  transform: scale(0.98);
+}
+
+.shareMenuItem svg {
+  flex-shrink: 0;
+  color: var(--color-primary);
+}
+
+.shareMenuDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0.5rem 0;
+}
+
 /* Responsivo */
 @media (max-width: 768px) {
   .phrasesCard {

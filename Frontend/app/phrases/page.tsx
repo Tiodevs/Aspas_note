@@ -620,6 +620,8 @@ export default function DashboardPage() {
                   key={phrase.id}
                   phrase={phrase}
                   onClick={() => openModal(phrase)}
+                  showActions={true}
+                  showMetadata={true}
                 />
               ))}
             </>
