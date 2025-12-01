@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { DecksService } from '../services/decks/decks.service';
-import { CreateDeckInput, UpdateDeckInput, AddPhraseToDeckInput, DeckFilters } from '../schemas/decks.schemas';
+import { CreateDeckInput, UpdateDeckInput, AddPhraseToDeckInput, AddPhraseToDeckServiceInput, DeckFilters } from '../schemas/decks.schemas';
 
 const decksService = new DecksService();
 
@@ -217,7 +217,7 @@ export class DecksController {
         });
       }
 
-      const data: AddPhraseToDeckInput = {
+      const data: AddPhraseToDeckServiceInput = {
         phraseId,
         deckId,
         userId: userIdAuth

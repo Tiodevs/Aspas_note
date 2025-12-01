@@ -43,13 +43,20 @@ export const updateDeckSchema = z.object({
 });
 
 // Schema para adicionar uma frase a um baralho (criar um card)
-// Nota: deckId vem dos parâmetros da URL, não do body
+// Nota: deckId vem dos parâmetros da URL, não do body (validação apenas do phraseId)
 export const addPhraseToDeckSchema = z.object({
   phraseId: z
     .string()
     .min(1, 'ID da frase é obrigatório')
     .regex(CUID_REGEX, 'ID da frase deve ser um CUID válido')
 });
+
+// Tipo interno completo para o serviço (inclui todos os campos)
+export type AddPhraseToDeckServiceInput = {
+  phraseId: string;
+  deckId: string;
+  userId: string;
+};
 
 // Schema para registrar uma revisão (grade)
 export const reviewCardSchema = z.object({

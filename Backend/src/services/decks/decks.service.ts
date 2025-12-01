@@ -1,5 +1,5 @@
 import prisma from '../../prisma/client';
-import { CreateDeckInput, UpdateDeckInput, AddPhraseToDeckInput, DeckFilters } from '../../schemas/decks.schemas';
+import { CreateDeckInput, UpdateDeckInput, AddPhraseToDeckServiceInput, DeckFilters } from '../../schemas/decks.schemas';
 import Log from '../../models/Log';
 
 export class DecksService {
@@ -112,7 +112,7 @@ export class DecksService {
             phrase: true
           },
           take: 10, // Limitar cartões retornados para não sobrecarregar
-          orderBy: { createdAt: 'desc' }
+          orderBy: { id: 'desc' }
         }
       }
     });
@@ -229,7 +229,7 @@ export class DecksService {
   /**
    * Adiciona uma frase a um baralho (cria um card)
    */
-  async addPhraseToDeck(data: AddPhraseToDeckInput) {
+  async addPhraseToDeck(data: AddPhraseToDeckServiceInput) {
     const { phraseId, deckId, userId } = data;
 
     // Verificar se a frase existe e pertence ao usuário
@@ -376,7 +376,7 @@ export class DecksService {
         where: { deckId },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { id: 'desc' },
         include: {
           phrase: true
         }
