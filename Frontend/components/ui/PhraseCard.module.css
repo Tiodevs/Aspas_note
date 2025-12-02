@@ -1,9 +1,10 @@
 /* Base do card - mantém o padrão do phrases */
 .phrasesCard {
-  width: 48.5%;
+  width: 100%;
   min-height: 90px;
   max-height: fit-content;
-  margin-bottom: 3%;
+  margin-bottom: 24px;
+  break-inside: avoid;
   background: var(--color-background2);
   border: 1px solid var(--color-border);
   border-radius: 12px;

@@ -1,0 +1,180 @@
+.container {
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-white);
+}
+
+.loadingContainer {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingSpinner {
+  width: 4rem;
+  height: 4rem;
+  border: 3px solid rgba(0, 255, 204, 0.2);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.main {
+  padding-top: 130px;
+  width: 800px;
+  margin: 0 auto;
+  padding-bottom: 130px;
+}
+
+.mobileLogo {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .main {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.content {
+  width: 100%;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--color-white);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--color-subtitle);
+  margin-bottom: 3rem;
+}
+
+.gamesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.gameCard {
+  background: var(--color-background2);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.gameCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+}
+
+.gameIcon {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gameName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-white);
+}
+
+.gameDescription {
+  font-size: 0.95rem;
+  color: var(--color-subtitle);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.playButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.875rem 2rem;
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.playButton:hover {
+  background: #00e6b8;
+  transform: translateY(-2px);
+}
+
+.disabledButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 2rem;
+  background: var(--color-background2);
+  color: var(--color-subtitle);
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  cursor: not-allowed;
+}
+
+@media (max-width: 850px) {
+  .main {
+    width: 95%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-top: 20px;
+  }
+
+  .mobileLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+  
+  .gamesGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .gameCard {
+    padding: 1.5rem;
+  }
+}
+

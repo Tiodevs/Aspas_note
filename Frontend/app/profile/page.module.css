@@ -12,6 +12,10 @@
   padding-bottom: 130px;
 }
 
+.mobileLogo {
+  display: none;
+}
+
 .header {
   margin-bottom: 40px;
 }
@@ -235,9 +239,16 @@
 /* Responsive */
 @media (max-width: 768px) {
   .content {
-    padding-top: 100px;
+    padding-top: 20px;
     padding-left: 16px;
     padding-right: 16px;
+  }
+
+  .mobileLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
   }
 
   .title {

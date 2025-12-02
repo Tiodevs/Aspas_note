@@ -189,6 +189,10 @@ export default function ProfilePage() {
       <Navigation />
       
       <div className={styles.content}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
 
         {/* Seção do Perfil */}
         <div className={styles.profileSection}>
