@@ -27,5 +27,8 @@ export const envs = {
     },
     mongo: {
         uri: process.env.MONGO_URI || "mongodb://localhost:27017/aspas_note"
+    },
+    openai: {
+        apiKey: process.env.OPENAI_API_KEY || ""
     }
 }

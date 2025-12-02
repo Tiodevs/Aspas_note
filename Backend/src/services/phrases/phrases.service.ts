@@ -154,13 +154,13 @@ export class PhrasesService {
 
     // Buscar todos os autores únicos
     async getUniqueAuthors(userId?: string, userIdAuth?: string): Promise<string[]> {
-        // Se userId foi fornecido, fazer validação de autorização
-        if (userId && userIdAuth) {
-            // Verificar se userIdAuth foi fornecido
-            if (!userIdAuth) {
-                throw new Error('Usuário não autenticado');
-            }
+        // Verificar se userIdAuth foi fornecido
+        if (!userIdAuth) {
+            throw new Error('Usuário não autenticado');
+        }
 
+        // Se userId foi fornecido, fazer validação de autorização
+        if (userId) {
             // Verificar se o usuário é admin ou o userId é o mesmo passado no filtro
             const user = await prisma.user.findUnique({
                 where: { id: userIdAuth }
@@ -186,22 +186,23 @@ export class PhrasesService {
             where,
             select: {
                 author: true
-            },
-            distinct: ['author']
+            }
         });
 
-        return result.map(item => item.author);
+        // Extrair autores únicos
+        const uniqueAuthors = [...new Set(result.map(item => item.author))].filter(author => author && author.trim() !== '');
+        return uniqueAuthors;
     }
 
     // Buscar todas as tags únicas
     async getUniqueTags(userId?: string, userIdAuth?: string): Promise<string[]> {
-        // Se userId foi fornecido, fazer validação de autorização
-        if (userId && userIdAuth) {
-            // Verificar se userIdAuth foi fornecido
-            if (!userIdAuth) {
-                throw new Error('Usuário não autenticado');
-            }
+        // Verificar se userIdAuth foi fornecido
+        if (!userIdAuth) {
+            throw new Error('Usuário não autenticado');
+        }
 
+        // Se userId foi fornecido, fazer validação de autorização
+        if (userId) {
             // Verificar se o usuário é admin ou o userId é o mesmo passado no filtro
             const user = await prisma.user.findUnique({
                 where: { id: userIdAuth }
