@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
-import { Navigation, PhraseCard } from '@/components/ui'
+import { Navigation, Logo, PhraseCard } from '@/components/ui'
 import { profileAPI, Profile, frasesAPI, Phrase } from '@/lib/api'
 import styles from './page.module.css'
 import { LucideUser } from 'lucide-react'
@@ -30,34 +30,46 @@ export default function PublicProfilePage() {
 
   // Verificar se está seguindo o usuário
   const checkFollowingStatus = useCallback(async () => {
-    if (!session?.user?.id || !userId) {
+    // Não verificar se for o próprio perfil
+    if (!session?.user?.id || !profile?.id || session.user.id === userId) {
       setIsFollowing(false)
       return
     }
 
     try {
+      // Buscar quem o usuário logado está seguindo
       const following = await profileAPI.getFollowing(session.user.id)
       
-      // following é um array de objetos com userId
-      // Verificar se algum dos perfis seguidos tem o userId igual ao userId do perfil atual
+      console.log('Verificando status de seguir:', {
+        followingCount: following?.length,
+        currentProfileId: profile.id,
+        following: following?.map((f: any) => ({ id: f.id, userId: f.userId }))
+      })
+      
+      // Verificar se o profileId do perfil atual está na lista de perfis seguidos
+      // A relação Follow é entre profiles (profileId), não entre users (userId)
       const isFollowingUser = Array.isArray(following) && following.some(
         (followed: any) => {
-          // Converter para string para garantir comparação correta
-          const followedUserId = String(followed.userId || '')
-          const followedUserFromUser = String(followed.user?.id || '')
-          const targetUserId = String(userId)
+          // Comparar profileId (id do perfil seguido) com profileId do perfil atual
+          const followedProfileId = String(followed.id || '')
+          const targetProfileId = String(profile.id)
+          const matches = followedProfileId === targetProfileId
           
-          // Comparar tanto userId quanto user.id para garantir
-          return followedUserId === targetUserId || followedUserFromUser === targetUserId
+          if (matches) {
+            console.log('Match encontrado:', { followedProfileId, targetProfileId })
+          }
+          
+          return matches
         }
       )
       
+      console.log('Resultado da verificação:', { isFollowingUser, currentState: isFollowing })
       setIsFollowing(!!isFollowingUser)
     } catch (error) {
       console.error('Erro ao verificar status de seguir:', error)
       setIsFollowing(false)
     }
-  }, [session?.user?.id, userId])
+  }, [session?.user?.id, profile?.id, userId])
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -84,8 +96,8 @@ export default function PublicProfilePage() {
           setPhrasesCount(0)
         }
 
-        // Verificar se está seguindo
-        await checkFollowingStatus()
+        // Verificar se está seguindo (após carregar o profile)
+        // checkFollowingStatus será chamado quando profile mudar
       } catch (err: any) {
         console.error('Erro ao carregar perfil:', err)
         if (err.message?.includes('404') || err.message?.includes('não encontrado')) {
@@ -104,13 +116,26 @@ export default function PublicProfilePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, userId, session?.user?.id])
 
+  // Verificar status de seguir quando o profile for carregado
+  useEffect(() => {
+    if (profile?.id && session?.user?.id && session.user.id !== userId) {
+      console.log('Verificando status de seguir ao carregar perfil...')
+      checkFollowingStatus()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id, session?.user?.id, userId])
+
   const handleFollow = async () => {
-    if (!session?.user?.id || !userId || isFollowingLoading) return
+    // Não permitir seguir o próprio perfil
+    if (!session?.user?.id || !userId || !profile?.id || isFollowingLoading || session.user.id === userId) {
+      return
+    }
 
     setIsFollowingLoading(true)
     try {
       if (isFollowing) {
         await profileAPI.unfollow(userId)
+        console.log('Unfollowing profile:', userId)
         setIsFollowing(false)
         // Atualizar contagem de seguidores
         if (profile) {
@@ -120,18 +145,46 @@ export default function PublicProfilePage() {
           })
         }
       } else {
-        await profileAPI.follow(userId)
-        setIsFollowing(true)
-        // Atualizar contagem de seguidores
-        if (profile) {
-          setProfile({
-            ...profile,
-            followersCount: profile.followersCount + 1
-          })
+        try {
+          await profileAPI.follow(userId)
+          console.log('Following profile:', userId)
+          setIsFollowing(true)
+          // Atualizar contagem de seguidores
+          if (profile) {
+            setProfile({
+              ...profile,
+              followersCount: profile.followersCount + 1
+            })
+          }
+        } catch (followError: any) {
+          // Se o erro for 409 (já está seguindo), apenas atualizar o estado
+          const errorMessage = followError.message || ''
+          const errorCode = followError.code || ''
+          const errorStatus = followError.status || 0
+          
+          const isAlreadyFollowing = errorStatus === 409 || 
+                                     errorCode === 'ALREADY_FOLLOWING' ||
+                                     errorMessage.includes('409') || 
+                                     errorMessage.includes('já está seguindo') ||
+                                     errorMessage.includes('ALREADY_FOLLOWING')
+          
+          if (isAlreadyFollowing) {
+            console.log('Já está seguindo este perfil, atualizando estado...', { errorCode, errorStatus })
+            setIsFollowing(true)
+            // Recarregar status do servidor para garantir sincronização
+            await checkFollowingStatus()
+            return
+          }
+          // Para outros erros, relançar
+          throw followError
         }
       }
+      // Recarregar o status para garantir sincronização
+      await checkFollowingStatus()
     } catch (error) {
       console.error('Erro ao seguir/deixar de seguir:', error)
+      // Em caso de erro, recarregar o status do servidor
+      await checkFollowingStatus()
     } finally {
       setIsFollowingLoading(false)
     }
@@ -176,13 +229,19 @@ export default function PublicProfilePage() {
     )
   }
 
-  const isOwnProfile = session?.user?.id === userId
+  // Verificar se é o próprio perfil - comparar userId do parâmetro com userId da sessão
+  const isOwnProfile = session?.user?.id && userId && session.user.id === userId
 
   return (
     <div className={styles.container}>
       <Navigation />
 
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
+        
         {/* Seção do Perfil */}
         <div className={styles.profileSection}>
           <div className={styles.avatarContainer}>

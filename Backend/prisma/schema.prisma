@@ -14,6 +14,13 @@ enum Role {
   PRO
 }
 
+enum Grade {
+  AGAIN // 1: Errou ou esqueceu
+  HARD  // 2: Achou difícil, mas lembrou
+  GOOD  // 3: Lembrou bem
+  EASY  // 4: Lembrou facilmente
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -31,6 +38,12 @@ model User {
   // Relacionamento 1:1 com Profile
   profile   Profile?
   
+  // Relacionamento com baralhos (decks)
+  decks     Deck[]
+  
+  // Relacionamento com os Cartões (Estado de Revisão)
+  cards     Card[]
+  
   @@map("users")
 }
 
@@ -45,6 +58,9 @@ model Phrase {
   // Relacionamento com usuário
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relacionamento com os Cartões que usam esta frase
+  cards     Card[]
   
   @@map("phrases")
 }
@@ -92,6 +108,80 @@ model PasswordReset {
   
   @@map("password_resets")
 }
+
+// -----------------------------------------------------------
+// SPACED REPETITION SYSTEM (SRS) MODELS
+// -----------------------------------------------------------
+
+// Baralho (Deck) - contém múltiplas frases para revisão
+model Deck {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacionamento com usuário dono do baralho
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relacionamento com os cartões (frases) do baralho
+  cards       Card[]
+  
+  @@map("decks")
+}
+
+// Armazena o estado de revisão de UMA FRASE para UM USUÁRIO em UM BARALHO.
+// O estado é o que determina quando o cartão deve ser revisado novamente.
+model Card {
+  id                String    @id @default(cuid())
+  
+  // Conteúdo
+  phraseId          String
+  phrase            Phrase    @relation(fields: [phraseId], references: [id], onDelete: Cascade)
+  
+  // Baralho ao qual este cartão pertence
+  deckId            String
+  deck              Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  
+  // Usuário dono deste estado de revisão
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Metadados do SM-2
+  easinessFactor    Float     @default(2.5) // Fator de facilidade (E-Factor), 1.3 mínimo
+  interval          Int       @default(0)   // Intervalo em dias até a próxima revisão
+  repetitions       Int       @default(0)   // Número de repetições bem-sucedidas consecutivas
+  nextReviewDate    DateTime  @default(now()) // Data da próxima revisão
+
+  // Histórico
+  lastReviewedAt    DateTime?
+  reviews           Review[]
+
+  @@unique([userId, phraseId, deckId])
+  @@map("cards")
+}
+
+// Armazena cada evento de revisão para fins de histórico e estatísticas.
+model Review {
+  id                String    @id @default(cuid())
+  cardId            String
+  card              Card      @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  
+  reviewedAt        DateTime  @default(now())
+  
+  // A nota dada pelo usuário (1=AGAIN, 4=EASY)
+  grade             Grade
+  
+  // Armazenar o estado antigo e novo para rastreamento
+  oldEasinessFactor Float
+  newEasinessFactor Float
+  oldInterval       Int
+  newInterval       Int
+  
+  @@map("reviews")
+}
+
 // Comando para gerar o modelo
 // npx prisma generate
-// npx prisma migrate dev --name auth
+// npx prisma migrate dev --name spaced-repetition-game

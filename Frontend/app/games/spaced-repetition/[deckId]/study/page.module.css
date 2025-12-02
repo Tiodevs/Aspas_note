@@ -1,0 +1,354 @@
+.container {
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-white);
+}
+
+.loadingContainer {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingSpinner {
+  width: 4rem;
+  height: 4rem;
+  border: 3px solid rgba(0, 255, 204, 0.2);
+  border-top: 3px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.main {
+  padding-top: 130px;
+  width: 800px;
+  margin: 0 auto;
+  padding-bottom: 130px;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .main {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+.content {
+  width: 100%;
+}
+
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  margin-bottom: 2rem;
+  transition: color 0.2s ease;
+}
+
+.backButton:hover {
+  color: var(--color-primary);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.deckName {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-white);
+  margin: 0;
+}
+
+.progress {
+  font-size: 1rem;
+  color: var(--color-subtitle);
+  padding: 0.5rem 1rem;
+  background: var(--color-background2);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+}
+
+.cardContainer {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.cardFront,
+.cardBack {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--color-background2);
+  border: 1px solid var(--color-border);
+}
+
+.cardBack {
+  transform: rotateY(180deg);
+}
+
+.phrase {
+  font-size: 1.5rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: var(--color-white);
+  font-weight: 400;
+}
+
+.author {
+  font-size: 1.1rem;
+  color: var(--color-subtitle);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.hint {
+  font-size: 0.9rem;
+  color: var(--color-subtitle);
+  margin-top: 1rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.tag {
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid rgba(0, 255, 204, 0.3);
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: var(--color-primary);
+}
+
+.gradeButtons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.gradeButtonAgain,
+.gradeButtonHard,
+.gradeButtonGood,
+.gradeButtonEasy {
+  padding: 1rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gradeButtonAgain {
+  background: rgba(255, 77, 77, 0.2);
+  color: #ff4d4d;
+  border: 1px solid rgba(255, 77, 77, 0.4);
+}
+
+.gradeButtonAgain:hover:not(:disabled) {
+  background: rgba(255, 77, 77, 0.3);
+  transform: translateY(-2px);
+}
+
+.gradeButtonHard {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.gradeButtonHard:hover:not(:disabled) {
+  background: rgba(255, 193, 7, 0.3);
+  transform: translateY(-2px);
+}
+
+.gradeButtonGood {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.gradeButtonGood:hover:not(:disabled) {
+  background: rgba(76, 175, 80, 0.3);
+  transform: translateY(-2px);
+}
+
+.gradeButtonEasy {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196f3;
+  border: 1px solid rgba(33, 150, 243, 0.4);
+}
+
+.gradeButtonEasy:hover:not(:disabled) {
+  background: rgba(33, 150, 243, 0.3);
+  transform: translateY(-2px);
+}
+
+.gradeButtonAgain:disabled,
+.gradeButtonHard:disabled,
+.gradeButtonGood:disabled,
+.gradeButtonEasy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.completedState {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.completedIcon {
+  color: var(--color-primary);
+  margin-bottom: 1.5rem;
+}
+
+.completedTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-white);
+}
+
+.completedText {
+  font-size: 1.1rem;
+  color: var(--color-subtitle);
+  margin-bottom: 2rem;
+}
+
+.completedActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.backLink,
+.dashboardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.backLink {
+  background: var(--color-background2);
+  color: var(--color-white);
+  border: 1px solid var(--color-border);
+}
+
+.backLink:hover {
+  border-color: var(--color-primary);
+}
+
+.dashboardLink {
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 700;
+  border: none;
+}
+
+.dashboardLink:hover {
+  background: #00e6b8;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 850px) {
+  .main {
+    width: 95%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .card {
+    height: 350px;
+  }
+
+  .cardFront,
+  .cardBack {
+    padding: 1.5rem;
+  }
+
+  .phrase {
+    font-size: 1.2rem;
+  }
+
+  .gradeButtons {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .completedActions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .backLink,
+  .dashboardLink {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

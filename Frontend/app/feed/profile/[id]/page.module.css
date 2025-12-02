@@ -66,6 +66,10 @@
   padding-bottom: 130px;
 }
 
+.mobileLogo {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .main {
     width: 100%;
@@ -120,22 +124,22 @@
 }
 
 .statLabel {
-  font-size: 0.9rem;
-  color: var(--color-subtitle);
-  text-transform: uppercase;
+  font-size: 1rem;
+  color: var(--color-white);
   letter-spacing: 0.05em;
+  font-weight: 500;
 }
 
 .statValue {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--color-white);
 }
 
 .statDivider {
   width: 1px;
-  height: 40px;
-  background: var(--color-border);
+  height: 60px;
+  background: var(--color-primary);
 }
 
 .followButton {
@@ -206,8 +210,14 @@
 
 @media (max-width: 768px) {
   .main {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 20px 1rem 120px 1rem;
+  }
+
+  .mobileLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
   }
 
   .stats {

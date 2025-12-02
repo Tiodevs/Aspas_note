@@ -57,9 +57,15 @@ class ApiClient {
 
     if (!response.ok) {
       let errorMessage = `Erro na API: ${response.status}`
+      let errorCode: string | undefined
       try {
         const errorData = await response.json()
         console.error('Detalhes do erro da API POST:', errorData)
+        
+        // Capturar o código de erro se existir
+        if (errorData.code) {
+          errorCode = errorData.code
+        }
         
         if (errorData.error) {
           errorMessage += ` - ${errorData.error}`
@@ -84,13 +90,17 @@ class ApiClient {
       } catch (e) {
         console.error('Erro ao fazer parse do JSON de erro:', e)
       }
-      throw new Error(errorMessage)
+      
+      const error = new Error(errorMessage) as Error & { code?: string; status?: number }
+      error.code = errorCode
+      error.status = response.status
+      throw error
     }
 
     return response.json()
   }
 
-  async put(endpoint: string, data: PhraseUpdateData | UpdateProfileData) {
+  async put(endpoint: string, data: PhraseUpdateData | UpdateProfileData | Record<string, unknown>) {
     const headers = await this.getAuthHeaders()
     
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -279,6 +289,117 @@ export const profileAPI = {
   unfollow: (followingUserId: string): Promise<{ message: string }> => 
     apiClient.post('/profile/unfollow', { followingUserId }),
   getMonthlyReport: (): Promise<MonthlyReport> => apiClient.get('/profile/me/monthly-report'),
+}
+
+// Interfaces para Decks e Repetição Espaçada
+export interface Deck {
+  id: string
+  name: string
+  description?: string | null
+  userId: string
+  createdAt: string
+  updatedAt: string
+  _count?: { cards: number }
+}
+
+export interface Card {
+  id: string
+  phraseId: string
+  deckId: string
+  userId: string
+  easinessFactor: number
+  interval: number
+  repetitions: number
+  nextReviewDate: string
+  lastReviewedAt?: string | null
+  phrase?: Phrase
+  deck?: Deck
+}
+
+export interface ReviewQueueItem {
+  cardId: string
+  phraseId: string
+  phrase: string
+  author: string
+  tags: string[]
+  deckId: string
+  deckName: string
+  easinessFactor: number
+  interval: number
+  repetitions: number
+  nextReviewDate: string
+  lastReviewedAt: string | null
+  isNew: boolean
+}
+
+export type Grade = 'AGAIN' | 'HARD' | 'GOOD' | 'EASY'
+
+export interface ReviewStats {
+  totalCards: number
+  newCards: number
+  dueCards: number
+  overdueCards: number
+  gradeStats: {
+    AGAIN: number
+    HARD: number
+    GOOD: number
+    EASY: number
+  }
+}
+
+export interface DeckFilters {
+  userId?: string
+  page?: number
+  limit?: number
+  [key: string]: string | number | undefined
+}
+
+// Funções de API para Decks
+export const decksAPI = {
+  // Baralhos
+  listar: (filters?: DeckFilters): Promise<{ decks: Deck[]; pagination: { page: number; limit: number; total: number; pages: number } }> =>
+    apiClient.get('/decks', filters),
+  
+  buscarPorId: (id: string): Promise<Deck & { cards: Card[] }> =>
+    apiClient.get(`/decks/${id}`),
+  
+  criar: (data: { name: string; description?: string; userId: string }): Promise<Deck> =>
+    apiClient.post('/decks', data),
+  
+  atualizar: (id: string, data: { name?: string; description?: string }): Promise<Deck> =>
+    apiClient.put(`/decks/${id}`, data),
+  
+  deletar: (id: string): Promise<{ message: string }> =>
+    apiClient.delete(`/decks/${id}`),
+  
+  // Cartões
+  listarCartoes: (deckId: string, page?: number, limit?: number): Promise<{ cards: Card[]; pagination: { page: number; limit: number; total: number; pages: number } }> =>
+    apiClient.get(`/decks/${deckId}/cards`, { page, limit }),
+  
+  adicionarFrase: (deckId: string, phraseId: string): Promise<Card> =>
+    apiClient.post(`/decks/${deckId}/phrases`, { phraseId }),
+  
+  removerFrase: (cardId: string): Promise<{ message: string }> =>
+    apiClient.delete(`/decks/cards/${cardId}`),
+}
+
+// Funções de API para Reviews
+export const reviewsAPI = {
+  obterFila: (deckId?: string, limit?: number): Promise<{ queue: ReviewQueueItem[]; count: number }> =>
+    apiClient.get('/reviews/queue', { deckId, limit }),
+  
+  processarRevisao: async (cardId: string, grade: Grade): Promise<{ success: boolean; card: Card; changes: any }> => {
+    // Obter userId da sessão
+    const session = await getSession()
+    if (!session?.user?.id) {
+      throw new Error('Usuário não autenticado')
+    }
+    
+    return apiClient.post('/reviews', { cardId, grade, userId: session.user.id })
+  },
+  
+  obterEstatisticas: (deckId?: string): Promise<ReviewStats> =>
+    apiClient.get('/reviews/stats', deckId ? { deckId } : undefined),
 }
 
 // Exemplo de uso:

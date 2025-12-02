@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import styles from './page.module.css'
 import { Navigation, Logo, PhraseCard } from '@/components/ui'
-import { frasesAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData } from '@/lib/api'
+import { frasesAPI, decksAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData, Deck } from '@/lib/api'
 import { Edit, Trash2, X, Filter, Plus, Search } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -30,15 +30,19 @@ export default function DashboardPage() {
   const [uniqueTags, setUniqueTags] = useState<string[]>([])
   const [editTagInput, setEditTagInput] = useState('')
   const [createTagInput, setCreateTagInput] = useState('')
+  const [availableDecks, setAvailableDecks] = useState<Deck[]>([])
+  const [editDeckInput, setEditDeckInput] = useState('')
+  const [createDeckInput, setCreateDeckInput] = useState('')
   
   // Estados para o modal de detalhes
   const [selectedPhrase, setSelectedPhrase] = useState<Phrase | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
-  const [editFormData, setEditFormData] = useState<PhraseUpdateData>({
+  const [editFormData, setEditFormData] = useState<PhraseUpdateData & { decks: string[] }>({
     phrase: '',
     author: '',
-    tags: []
+    tags: [],
+    decks: []
   })
   
   // Estados para o modal de criação
@@ -46,7 +50,8 @@ export default function DashboardPage() {
   const [createFormData, setCreateFormData] = useState({
     phrase: '',
     author: '',
-    tags: [] as string[]
+    tags: [] as string[],
+    decks: [] as string[]
   })
   const [authorSuggestions, setAuthorSuggestions] = useState<string[]>([])
   const [showAuthorSuggestions, setShowAuthorSuggestions] = useState(false)
@@ -97,14 +102,16 @@ export default function DashboardPage() {
     
     setInitialLoading(true)
     try {
-      // Carregar todas as opções de filtro e frases em paralelo
-      const [authors, tags] = await Promise.all([
+      // Carregar todas as opções de filtro, decks e frases em paralelo
+      const [authors, tags, decksResponse] = await Promise.all([
         frasesAPI.buscarAutoresUnicos(session.user.id),
-        frasesAPI.buscarTagsUnicas(session.user.id)
+        frasesAPI.buscarTagsUnicas(session.user.id),
+        decksAPI.listar({ userId: session.user.id })
       ])
       
       setUniqueAuthors(authors)
       setUniqueTags(tags)
+      setAvailableDecks(decksResponse.decks)
       
       // Carregar frases iniciais com userId da sessão
       const response: PhraseResponse = await frasesAPI.listar({ 
@@ -228,15 +235,48 @@ export default function DashboardPage() {
     return filters
   }
 
+  // Função para buscar decks associados a uma frase
+  const loadPhraseDecks = async (phraseId: string): Promise<string[]> => {
+    try {
+      if (!session?.user?.id) return []
+      
+      // Buscar todos os decks do usuário e verificar quais têm a frase
+      const decksResponse = await decksAPI.listar({ userId: session.user.id })
+      const phraseDecks: string[] = []
+      
+      // Para cada deck, verificar se tem a frase
+      for (const deck of decksResponse.decks) {
+        try {
+          const cardsResponse = await decksAPI.listarCartoes(deck.id, 1, 1000)
+          const hasPhrase = cardsResponse.cards.some(card => card.phraseId === phraseId)
+          if (hasPhrase) {
+            phraseDecks.push(deck.id)
+          }
+        } catch (error) {
+          // Ignorar erros ao buscar cards de um deck
+          console.error(`Erro ao buscar cards do deck ${deck.id}:`, error)
+        }
+      }
+      
+      return phraseDecks
+    } catch (error) {
+      console.error('Erro ao buscar decks da frase:', error)
+      return []
+    }
+  }
+
   // Funções do modal
-  const openModal = (phrase: Phrase) => {
+  const openModal = async (phrase: Phrase) => {
     setSelectedPhrase(phrase)
+    const phraseDecks = await loadPhraseDecks(phrase.id)
     setEditFormData({
       phrase: phrase.phrase,
       author: phrase.author,
-      tags: phrase.tags || []
+      tags: phrase.tags || [],
+      decks: phraseDecks
     })
     setEditTagInput('')
+    setEditDeckInput('')
     setIsModalOpen(true)
     setIsEditMode(false)
   }
@@ -246,6 +286,7 @@ export default function DashboardPage() {
     setSelectedPhrase(null)
     setIsEditMode(false)
     setEditTagInput('')
+    setEditDeckInput('')
   }
 
   const handleEdit = () => {
@@ -259,7 +300,40 @@ export default function DashboardPage() {
       setLoading(true)
       setSkipAutoFilters(true) // Desabilitar filtros automáticos temporariamente
       
+      // Atualizar a frase
       await frasesAPI.atualizar(selectedPhrase.id, editFormData)
+      
+      // Buscar decks antigos da frase
+      const oldDecks = await loadPhraseDecks(selectedPhrase.id)
+      
+      // Decks para adicionar (novos que não estavam antes)
+      const decksToAdd = editFormData.decks.filter(deckId => !oldDecks.includes(deckId))
+      
+      // Decks para remover (antigos que não estão mais selecionados)
+      const decksToRemove = oldDecks.filter(deckId => !editFormData.decks.includes(deckId))
+      
+      // Adicionar frase aos novos decks
+      for (const deckId of decksToAdd) {
+        try {
+          await decksAPI.adicionarFrase(deckId, selectedPhrase.id)
+        } catch (error) {
+          console.error(`Erro ao adicionar frase ao deck ${deckId}:`, error)
+        }
+      }
+      
+      // Remover frase dos decks antigos
+      for (const deckId of decksToRemove) {
+        try {
+          // Buscar o card para obter o ID
+          const cardsResponse = await decksAPI.listarCartoes(deckId, 1, 1000)
+          const card = cardsResponse.cards.find(c => c.phraseId === selectedPhrase.id)
+          if (card) {
+            await decksAPI.removerFrase(card.id)
+          }
+        } catch (error) {
+          console.error(`Erro ao remover frase do deck ${deckId}:`, error)
+        }
+      }
       
       // Recarregar as frases e filtros
       await Promise.all([
@@ -429,16 +503,142 @@ export default function DashboardPage() {
     [createTagInput, createFormData.tags, getTagSuggestions]
   )
 
+  // Funções para gerenciar decks
+  type DeckMode = 'edit' | 'create'
+
+  const addDeck = (deckId: string, mode: DeckMode) => {
+    if (mode === 'edit') {
+      setEditFormData(prev => {
+        if (prev.decks.includes(deckId)) {
+          return prev
+        }
+        return {
+          ...prev,
+          decks: [...prev.decks, deckId]
+        }
+      })
+      setEditDeckInput('')
+    } else {
+      setCreateFormData(prev => {
+        if (prev.decks.includes(deckId)) {
+          return prev
+        }
+        return {
+          ...prev,
+          decks: [...prev.decks, deckId]
+        }
+      })
+      setCreateDeckInput('')
+    }
+  }
+
+  const createAndAddDeck = async (deckName: string, mode: DeckMode) => {
+    if (!deckName.trim()) return
+    
+    if (!session?.user?.id) {
+      showMessage('error', 'Erro de autenticação. Faça login novamente.')
+      return
+    }
+
+    try {
+      setLoading(true)
+      
+      // Criar o novo deck
+      const newDeck = await decksAPI.criar({
+        name: deckName.trim(),
+        userId: session.user.id
+      })
+      
+      // Adicionar o deck à lista de decks disponíveis
+      setAvailableDecks(prev => [...prev, newDeck])
+      
+      // Adicionar o deck aos selecionados
+      addDeck(newDeck.id, mode)
+      
+      showMessage('success', `Deck "${newDeck.name}" criado com sucesso!`)
+    } catch (error) {
+      console.error('Erro ao criar deck:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao criar deck. Tente novamente.'
+      showMessage('error', errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeckAdd = async (mode: DeckMode) => {
+    const deckInput = mode === 'edit' ? editDeckInput : createDeckInput
+    
+    if (!deckInput.trim()) return
+    
+    // Verificar se o deck já existe
+    const existingDeck = availableDecks.find(d => d.name.toLowerCase() === deckInput.toLowerCase())
+    
+    if (existingDeck) {
+      // Se existe, apenas adicionar
+      addDeck(existingDeck.id, mode)
+    } else {
+      // Se não existe, criar novo deck
+      await createAndAddDeck(deckInput, mode)
+    }
+  }
+
+  const handleDeckKeyDown = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    mode: DeckMode
+  ) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      handleDeckAdd(mode)
+    }
+  }
+
+  const removeDeck = (deckId: string, mode: DeckMode) => {
+    if (mode === 'edit') {
+      setEditFormData(prev => ({
+        ...prev,
+        decks: prev.decks.filter(id => id !== deckId)
+      }))
+    } else {
+      setCreateFormData(prev => ({
+        ...prev,
+        decks: prev.decks.filter(id => id !== deckId)
+      }))
+    }
+  }
+
+  const getDeckSuggestions = useCallback(
+    (inputValue: string, selectedDeckIds: string[]) => {
+      const normalizedInput = inputValue.trim().toLowerCase()
+      return availableDecks
+        .filter(deck => !selectedDeckIds.includes(deck.id))
+        .filter(deck => !normalizedInput || deck.name.toLowerCase().includes(normalizedInput))
+        .slice(0, 8)
+    },
+    [availableDecks]
+  )
+
+  const editDeckSuggestions = useMemo(
+    () => getDeckSuggestions(editDeckInput, editFormData.decks),
+    [editDeckInput, editFormData.decks, getDeckSuggestions]
+  )
+
+  const createDeckSuggestions = useMemo(
+    () => getDeckSuggestions(createDeckInput, createFormData.decks),
+    [createDeckInput, createFormData.decks, getDeckSuggestions]
+  )
+
   // Funções do modal de criação
   const openCreateModal = () => {
     setCreateFormData({
       phrase: '',
       author: '',
-      tags: []
+      tags: [],
+      decks: []
     })
     setAuthorSuggestions([])
     setShowAuthorSuggestions(false)
     setCreateTagInput('')
+    setCreateDeckInput('')
     setIsCreateModalOpen(true)
   }
 
@@ -447,11 +647,13 @@ export default function DashboardPage() {
     setCreateFormData({
       phrase: '',
       author: '',
-      tags: []
+      tags: [],
+      decks: []
     })
     setAuthorSuggestions([])
     setShowAuthorSuggestions(false)
     setCreateTagInput('')
+    setCreateDeckInput('')
   }
 
   const handleCreatePhrase = async () => {
@@ -530,7 +732,16 @@ export default function DashboardPage() {
         }
       }
 
-      await frasesAPI.criar(phraseToCreate)
+      const createdPhrase = await frasesAPI.criar(phraseToCreate)
+
+      // Adicionar frase aos decks selecionados
+      for (const deckId of createFormData.decks) {
+        try {
+          await decksAPI.adicionarFrase(deckId, createdPhrase.id)
+        } catch (error) {
+          console.error(`Erro ao adicionar frase ao deck ${deckId}:`, error)
+        }
+      }
 
       // Recarregar as frases e filtros
       await Promise.all([
@@ -620,6 +831,8 @@ export default function DashboardPage() {
                   key={phrase.id}
                   phrase={phrase}
                   onClick={() => openModal(phrase)}
+                  showActions={true}
+                  showMetadata={true}
                 />
               ))}
             </>
@@ -737,6 +950,65 @@ export default function DashboardPage() {
                               </button>
                             </span>
                           ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className={styles.formGroup}>
+                    <label>Decks:</label>
+                    <div className={styles.tagManager}>
+                      <div className={styles.tagInputRow}>
+                        <input
+                          type="text"
+                          value={editDeckInput}
+                          onChange={(e) => setEditDeckInput(e.target.value)}
+                          onKeyDown={(event) => handleDeckKeyDown(event, 'edit')}
+                          className={styles.tagInputField}
+                          placeholder="Digite o nome do deck"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleDeckAdd('edit')}
+                          className={styles.tagAddButton}
+                        >
+                          Adicionar
+                        </button>
+                      </div>
+
+                      {editDeckSuggestions.length > 0 && (
+                        <div className={styles.tagSuggestions}>
+                          {editDeckSuggestions.map(deck => (
+                            <button
+                              key={deck.id}
+                              type="button"
+                              className={styles.tagSuggestionItem}
+                              onClick={() => addDeck(deck.id, 'edit')}
+                            >
+                              {deck.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {editFormData.decks.length > 0 && (
+                        <div className={styles.selectedTags}>
+                          {editFormData.decks.map(deckId => {
+                            const deck = availableDecks.find(d => d.id === deckId)
+                            return deck ? (
+                              <span key={deckId} className={styles.tagChip}>
+                                {deck.name}
+                                <button
+                                  type="button"
+                                  className={styles.tagRemoveButton}
+                                  onClick={() => removeDeck(deckId, 'edit')}
+                                  aria-label={`Remover deck ${deck.name}`}
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ) : null
+                          })}
                         </div>
                       )}
                     </div>
@@ -926,6 +1198,65 @@ export default function DashboardPage() {
                             </button>
                           </span>
                         ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className={styles.formGroup}>
+                  <label>Decks:</label>
+                  <div className={styles.tagManager}>
+                    <div className={styles.tagInputRow}>
+                      <input
+                        type="text"
+                        value={createDeckInput}
+                        onChange={(e) => setCreateDeckInput(e.target.value)}
+                        onKeyDown={(event) => handleDeckKeyDown(event, 'create')}
+                        className={styles.tagInputField}
+                        placeholder="Digite o nome do deck"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleDeckAdd('create')}
+                        className={styles.tagAddButton}
+                      >
+                        Adicionar
+                      </button>
+                    </div>
+
+                    {createDeckSuggestions.length > 0 && (
+                      <div className={styles.tagSuggestions}>
+                        {createDeckSuggestions.map(deck => (
+                          <button
+                            key={deck.id}
+                            type="button"
+                            className={styles.tagSuggestionItem}
+                            onClick={() => addDeck(deck.id, 'create')}
+                          >
+                            {deck.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {createFormData.decks.length > 0 && (
+                      <div className={styles.selectedTags}>
+                        {createFormData.decks.map(deckId => {
+                          const deck = availableDecks.find(d => d.id === deckId)
+                          return deck ? (
+                            <span key={deckId} className={styles.tagChip}>
+                              {deck.name}
+                              <button
+                                type="button"
+                                className={styles.tagRemoveButton}
+                                onClick={() => removeDeck(deckId, 'create')}
+                                aria-label={`Remover deck ${deck.name}`}
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ) : null
+                        })}
                       </div>
                     )}
                   </div>

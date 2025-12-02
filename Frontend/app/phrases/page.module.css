@@ -191,9 +191,10 @@
 }
 
 .phrasesContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3%;
+  padding: 0;
+  width: 100%;
+  column-count: 2;
+  column-gap: 24px;
   position: relative;
   min-height: 400px;
 }
@@ -328,11 +329,8 @@
   }
 
   .phrasesContainer {
-    gap: 2%;
-  }
-
-  .phrasesCard {
-    width: 49%;
+    column-count: 2;
+    column-gap: 24px;
   }
 }
 
@@ -417,8 +415,8 @@
 
   /* Cards responsivos */
   .phrasesContainer {
-    gap: 0;
-    flex-direction: column;
+    column-count: 1;
+    column-gap: 0;
   }
 
   .phrasesCard {

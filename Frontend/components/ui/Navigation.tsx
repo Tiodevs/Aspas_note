@@ -65,7 +65,7 @@ export default function Navigation({ onAddClick }: NavigationProps) {
           {isAuthenticated && (
             <>
               <Link
-                className={`${styles.navIcon} ${pathname === '/feed' ? styles.navIconActive : ''}`}
+                className={`${styles.navIcon} ${pathname.startsWith('/feed') ? styles.navIconActive : ''}`}
                 title="feed"
                 href="/feed"
               >
@@ -79,7 +79,7 @@ export default function Navigation({ onAddClick }: NavigationProps) {
                 <NotebookIcon size={20} />
               </Link>
               <Link
-                className={`${styles.navIcon} ${pathname === '/games' ? styles.navIconActive : ''}`}
+                className={`${styles.navIcon} ${pathname.startsWith('/games') ? styles.navIconActive : ''}`}
                 title="Jogos"
                 href="/games"
               >

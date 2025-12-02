@@ -315,7 +315,7 @@ export class ProfileService {
             const profile = await prisma.profile.findUnique({
                 where: { userId },
                 include: {
-                    followers: {
+                    following: {
                         include: {
                             follower: {
                                 include: {
@@ -338,7 +338,7 @@ export class ProfileService {
                 throw new Error('Perfil não encontrado');
             }
 
-            return profile.followers.map(f => ({
+            return profile.following.map(f => ({
                 id: f.follower.id,
                 userId: f.follower.userId,
                 avatar: f.follower.avatar,
@@ -361,7 +361,7 @@ export class ProfileService {
             const profile = await prisma.profile.findUnique({
                 where: { userId },
                 include: {
-                    following: {
+                    followers: {
                         include: {
                             following: {
                                 include: {
@@ -384,7 +384,7 @@ export class ProfileService {
                 throw new Error('Perfil não encontrado');
             }
 
-            return profile.following.map(f => ({
+            return profile.followers.map(f => ({
                 id: f.following.id,
                 userId: f.following.userId,
                 avatar: f.following.avatar,

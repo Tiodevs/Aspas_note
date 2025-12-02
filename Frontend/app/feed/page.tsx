@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
 import styles from './page.module.css'
-import { Navigation, PhraseCard } from '@/components/ui'
+import { Navigation, Logo, PhraseCard } from '@/components/ui'
 import { frasesAPI, PhraseWithUser } from '@/lib/api'
 
 export default function FeedPage() {
@@ -69,6 +69,10 @@ export default function FeedPage() {
       <Navigation />
 
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
 
         {loading && phrases.length === 0 ? (
           <div className={styles.loadingContainer}>
