@@ -79,7 +79,7 @@ export default function Navigation({ onAddClick }: NavigationProps) {
                 <NotebookIcon size={20} />
               </Link>
               <Link
-                className={`${styles.navIcon} ${pathname === '/games' ? styles.navIconActive : ''}`}
+                className={`${styles.navIcon} ${pathname.startsWith('/games') ? styles.navIconActive : ''}`}
                 title="Jogos"
                 href="/games"
               >
