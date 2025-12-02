@@ -191,6 +191,25 @@ export const frasesAPI = {
     apiClient.get('/phrases/feed', { page, limit }),
 }
 
+// Funções para IA
+export interface ExtractedPhrase {
+  phrase: string;
+  author: string | null;
+  tags: string[];
+  confidence: number;
+  context?: string;
+}
+
+export interface PhraseExtractionResult {
+  phrases: ExtractedPhrase[];
+  totalFound: number;
+}
+
+export const aiAPI = {
+  extractPhrases: (text: string): Promise<PhraseExtractionResult> => 
+    apiClient.post('/ai/extract-phrases', { text }),
+}
+
 export interface Phrase {
   id: string;
   phrase: string;
@@ -282,8 +301,8 @@ export const profileAPI = {
     apiClient.put('/profile/me', data),
   create: (data: UpdateProfileData): Promise<{ message: string; profile: Profile }> => 
     apiClient.post('/profile', data),
-  getFollowers: (userId: string): Promise<any[]> => apiClient.get(`/profile/user/${userId}/followers`),
-  getFollowing: (userId: string): Promise<any[]> => apiClient.get(`/profile/user/${userId}/following`),
+  getFollowers: (userId: string): Promise<Array<{ id: string; userId: string }>> => apiClient.get(`/profile/user/${userId}/followers`),
+  getFollowing: (userId: string): Promise<Array<{ id: string; userId: string }>> => apiClient.get(`/profile/user/${userId}/following`),
   follow: (followingUserId: string): Promise<{ message: string }> => 
     apiClient.post('/profile/follow', { followingUserId }),
   unfollow: (followingUserId: string): Promise<{ message: string }> => 
@@ -388,7 +407,7 @@ export const reviewsAPI = {
   obterFila: (deckId?: string, limit?: number): Promise<{ queue: ReviewQueueItem[]; count: number }> =>
     apiClient.get('/reviews/queue', { deckId, limit }),
   
-  processarRevisao: async (cardId: string, grade: Grade): Promise<{ success: boolean; card: Card; changes: any }> => {
+  processarRevisao: async (cardId: string, grade: Grade): Promise<{ success: boolean; card: Card; changes: Record<string, unknown> }> => {
     // Obter userId da sessão
     const session = await getSession()
     if (!session?.user?.id) {

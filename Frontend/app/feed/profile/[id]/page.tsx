@@ -43,13 +43,13 @@ export default function PublicProfilePage() {
       console.log('Verificando status de seguir:', {
         followingCount: following?.length,
         currentProfileId: profile.id,
-        following: following?.map((f: any) => ({ id: f.id, userId: f.userId }))
+        following: following?.map((f: { id: string; userId: string }) => ({ id: f.id, userId: f.userId }))
       })
       
       // Verificar se o profileId do perfil atual está na lista de perfis seguidos
       // A relação Follow é entre profiles (profileId), não entre users (userId)
       const isFollowingUser = Array.isArray(following) && following.some(
-        (followed: any) => {
+        (followed: { id: string }) => {
           // Comparar profileId (id do perfil seguido) com profileId do perfil atual
           const followedProfileId = String(followed.id || '')
           const targetProfileId = String(profile.id)
@@ -98,9 +98,10 @@ export default function PublicProfilePage() {
 
         // Verificar se está seguindo (após carregar o profile)
         // checkFollowingStatus será chamado quando profile mudar
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Erro ao carregar perfil:', err)
-        if (err.message?.includes('404') || err.message?.includes('não encontrado')) {
+        const error = err as { message?: string }
+        if (error.message?.includes('404') || error.message?.includes('não encontrado')) {
           setError('Perfil não encontrado')
         } else {
           setError('Erro ao carregar perfil. Tente novamente.')
@@ -156,11 +157,12 @@ export default function PublicProfilePage() {
               followersCount: profile.followersCount + 1
             })
           }
-        } catch (followError: any) {
+        } catch (followError: unknown) {
           // Se o erro for 409 (já está seguindo), apenas atualizar o estado
-          const errorMessage = followError.message || ''
-          const errorCode = followError.code || ''
-          const errorStatus = followError.status || 0
+          const error = followError as { message?: string; code?: string; status?: number }
+          const errorMessage = error.message || ''
+          const errorCode = error.code || ''
+          const errorStatus = error.status || 0
           
           const isAlreadyFollowing = errorStatus === 409 || 
                                      errorCode === 'ALREADY_FOLLOWING' ||
