@@ -22,12 +22,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@langchain/openai": "^0.3.17",
     "@prisma/client": "^5.10.2",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.3.36",
     "mongoose": "^9.0.0",
     "resend": "^4.8.0",
     "zod": "^4.0.5"
