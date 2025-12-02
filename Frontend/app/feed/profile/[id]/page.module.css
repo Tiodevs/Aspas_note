@@ -66,6 +66,10 @@
   padding-bottom: 130px;
 }
 
+.mobileLogo {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .main {
     width: 100%;
@@ -206,8 +210,14 @@
 
 @media (max-width: 768px) {
   .main {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 20px 1rem 120px 1rem;
+  }
+
+  .mobileLogo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
   }
 
   .stats {

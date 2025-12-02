@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { Navigation } from '@/components/ui'
+import { Navigation, Logo } from '@/components/ui'
 import styles from './page.module.css'
 import { Brain, Lock } from 'lucide-react'
 
@@ -55,6 +55,11 @@ export default function GamesPage() {
       <Navigation />
       
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
+        
         <div className={styles.content}>
           <h1 className={styles.title}>Jogos</h1>
           <p className={styles.subtitle}>Escolha um jogo para começar a aprender</p>

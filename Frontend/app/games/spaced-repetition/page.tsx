@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
-import { Navigation } from '@/components/ui'
+import { Navigation, Logo } from '@/components/ui'
 import { decksAPI, reviewsAPI, Deck, ReviewStats } from '@/lib/api'
 import styles from './page.module.css'
 import { Plus, Search, Edit, BookOpen, ArrowLeft } from 'lucide-react'
@@ -100,6 +100,11 @@ export default function SpacedRepetitionDashboard() {
       <Navigation />
       
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
+        
         <div className={styles.content}>
           <Link href="/games" className={styles.backButton}>
             <ArrowLeft size={20} />

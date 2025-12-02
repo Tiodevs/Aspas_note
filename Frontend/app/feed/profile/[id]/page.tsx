@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter, useParams } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
-import { Navigation, PhraseCard } from '@/components/ui'
+import { Navigation, Logo, PhraseCard } from '@/components/ui'
 import { profileAPI, Profile, frasesAPI, Phrase } from '@/lib/api'
 import styles from './page.module.css'
 import { LucideUser } from 'lucide-react'
@@ -237,6 +237,11 @@ export default function PublicProfilePage() {
       <Navigation />
 
       <main className={styles.main}>
+        {/* Logo no mobile */}
+        <div className={styles.mobileLogo}>
+          <Logo size="large" variant="secondary" />
+        </div>
+        
         {/* Seção do Perfil */}
         <div className={styles.profileSection}>
           <div className={styles.avatarContainer}>
