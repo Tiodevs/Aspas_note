@@ -510,10 +510,11 @@
 
 .modalHeader {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 25px 0 5px 0;
+  padding: 25px 30px 5px 30px;
   border-radius: 16px 16px 0 0;
+  position: relative;
 }
 
 .modalHeader h2 {
@@ -1072,5 +1073,211 @@
   .cancelButton {
     padding: 12px 18px;
     font-size: 15px;
+  }
+}
+
+/* Estilos para Extração de Frases com IA */
+.aiExtractButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  color: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aiExtractButton:hover {
+  background: rgba(0, 255, 204, 0.2);
+  transform: translateY(-1px);
+}
+
+.closeButton {
+  background: transparent;
+  border: none;
+  color: var(--color-white);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: var(--color-background2);
+}
+
+.extractButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--color-primary);
+  color: #000000;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.extractButton:hover:not(:disabled) {
+  background: #00e6b8;
+  transform: translateY(-1px);
+}
+
+.extractButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.textInfo {
+  margin-top: 8px;
+  font-size: 14px;
+  color: var(--color-subtitle);
+}
+
+.warningText {
+  color: #ef4444;
+}
+
+.extractedPhrasesContainer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+.extractedTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-white);
+  margin-bottom: 16px;
+}
+
+.extractedPhrasesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.extractedPhraseCard {
+  background: var(--color-background2);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.extractedPhraseCard:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.extractedPhraseCard.selected {
+  border-color: var(--color-primary);
+  background: rgba(0, 255, 204, 0.05);
+}
+
+.extractedPhraseHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.confidenceBadge {
+  padding: 4px 12px;
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid var(--color-primary);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.extractedPhraseText {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-white);
+  line-height: 1.5;
+  margin: 0 0 8px 0;
+}
+
+.extractedAuthor {
+  font-size: 14px;
+  color: var(--color-primary);
+  margin: 0 0 8px 0;
+  font-style: italic;
+}
+
+.extractedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.extractedTag {
+  padding: 4px 10px;
+  background: rgba(0, 255, 204, 0.1);
+  border: 1px solid var(--color-primary);
+  border-radius: 12px;
+  font-size: 12px;
+  color: var(--color-primary);
+}
+
+.extractedContext {
+  font-size: 13px;
+  color: var(--color-subtitle);
+  margin-top: 8px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .aiExtractButton {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .extractedPhrasesList {
+    max-height: 300px;
+  }
+
+  .extractedPhraseCard {
+    padding: 12px;
   }
 }

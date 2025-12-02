@@ -72,9 +72,10 @@ export default function SpacedRepetitionDashboard() {
       setIsCreateModalOpen(false)
       setCreateFormData({ name: '', description: '' })
       loadData()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao criar baralho:', error)
-      alert(error.message || 'Erro ao criar baralho')
+      const err = error as { message?: string }
+      alert(err.message || 'Erro ao criar baralho')
     } finally {
       setCreating(false)
     }

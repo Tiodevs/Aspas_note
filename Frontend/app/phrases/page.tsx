@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import styles from './page.module.css'
 import { Navigation, Logo, PhraseCard } from '@/components/ui'
-import { frasesAPI, decksAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData, Deck } from '@/lib/api'
-import { Edit, Trash2, X, Filter, Plus, Search } from 'lucide-react'
+import { frasesAPI, decksAPI, aiAPI, PhraseFilters, PhraseResponse, Phrase, PhraseUpdateData, PhraseCreateData, Deck, ExtractedPhrase } from '@/lib/api'
+import { Edit, Trash2, X, Filter, Plus, Search, Sparkles, Loader2 } from 'lucide-react'
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
@@ -67,6 +67,13 @@ export default function DashboardPage() {
   
   // Estado para o modal de filtros
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false)
+  
+  // Estados para o modal de extração de frases com IA
+  const [isExtractionModalOpen, setIsExtractionModalOpen] = useState(false)
+  const [extractionText, setExtractionText] = useState('')
+  const [extractedPhrases, setExtractedPhrases] = useState<ExtractedPhrase[]>([])
+  const [isExtracting, setIsExtracting] = useState(false)
+  const [selectedExtractedPhrases, setSelectedExtractedPhrases] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -656,6 +663,124 @@ export default function DashboardPage() {
     setCreateDeckInput('')
   }
 
+  // Funções para extração de frases com IA
+  const handleExtractPhrases = async () => {
+    if (extractionText.length < 50) {
+      showMessage('error', 'O texto deve ter pelo menos 50 caracteres.')
+      return
+    }
+
+    try {
+      setIsExtracting(true)
+      const result = await aiAPI.extractPhrases(extractionText)
+      setExtractedPhrases(result.phrases)
+      setSelectedExtractedPhrases(new Set())
+      
+      if (result.phrases.length === 0) {
+        showMessage('error', 'Nenhuma frase relevante foi encontrada no texto.')
+      } else {
+        showMessage('success', `${result.phrases.length} frase(s) extraída(s) com sucesso!`)
+      }
+    } catch (error: unknown) {
+      console.error('Erro ao extrair frases:', error)
+      const err = error as { message?: string }
+      const errorMessage = err.message || 'Erro ao extrair frases. Tente novamente.'
+      showMessage('error', errorMessage)
+    } finally {
+      setIsExtracting(false)
+    }
+  }
+
+  const toggleSelectExtractedPhrase = (index: number) => {
+    setSelectedExtractedPhrases(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(index)) {
+        newSet.delete(index)
+      } else {
+        newSet.add(index)
+      }
+      return newSet
+    })
+  }
+
+  const handleImportSelectedPhrases = () => {
+    if (selectedExtractedPhrases.size === 0) {
+      showMessage('error', 'Selecione pelo menos uma frase para importar.')
+      return
+    }
+
+    // Se apenas uma frase foi selecionada, preencher o formulário diretamente
+    if (selectedExtractedPhrases.size === 1) {
+      const index = Array.from(selectedExtractedPhrases)[0]
+      const extracted = extractedPhrases[index]
+      setCreateFormData({
+        phrase: extracted.phrase,
+        author: extracted.author || '',
+        tags: extracted.tags,
+        decks: []
+      })
+      setIsExtractionModalOpen(false)
+      setIsCreateModalOpen(true)
+    } else {
+      // Se múltiplas frases, criar todas de uma vez
+      handleCreateMultiplePhrases()
+    }
+
+    // Limpar estados
+    setExtractionText('')
+    setExtractedPhrases([])
+    setSelectedExtractedPhrases(new Set())
+  }
+
+  const handleCreateMultiplePhrases = async () => {
+    const phrasesToCreate = Array.from(selectedExtractedPhrases).map(index => extractedPhrases[index])
+    
+    if (!session?.user?.id) {
+      showMessage('error', 'Erro de autenticação. Faça login novamente.')
+      return
+    }
+
+    try {
+      setLoading(true)
+      let successCount = 0
+      let errorCount = 0
+
+      for (const extracted of phrasesToCreate) {
+        try {
+          await frasesAPI.criar({
+            phrase: extracted.phrase,
+            author: extracted.author || 'Desconhecido',
+            tags: extracted.tags,
+            userId: session.user.id
+          })
+          successCount++
+        } catch (error) {
+          console.error('Erro ao criar frase:', error)
+          errorCount++
+        }
+      }
+
+      if (successCount > 0) {
+        showMessage('success', `${successCount} frase(s) criada(s) com sucesso!`)
+        loadPhrases()
+      }
+      
+      if (errorCount > 0) {
+        showMessage('error', `${errorCount} frase(s) falharam ao ser criada(s).`)
+      }
+
+      setIsExtractionModalOpen(false)
+      setExtractionText('')
+      setExtractedPhrases([])
+      setSelectedExtractedPhrases(new Set())
+    } catch (error) {
+      console.error('Erro ao criar frases:', error)
+      showMessage('error', 'Erro ao criar frases. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleCreatePhrase = async () => {
     // Validações mais rigorosas
     if (!createFormData.phrase.trim()) {
@@ -1091,6 +1216,17 @@ export default function DashboardPage() {
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2>Criar Nova Frase</h2>
+              <button
+                onClick={() => {
+                  setIsExtractionModalOpen(true)
+                  setIsCreateModalOpen(false)
+                }}
+                className={styles.aiExtractButton}
+                title="Extrair frases de texto com IA"
+              >
+                <Sparkles size={18} />
+                Extrair com IA
+              </button>
             </div>
             
             <div className={styles.modalBody}>
@@ -1333,6 +1469,133 @@ export default function DashboardPage() {
                 className={styles.cancelButton}
               >
                 Limpar Filtros
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de extração de frases com IA */}
+      {isExtractionModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsExtractionModalOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2>Extrair Frases com IA</h2>
+              <button
+                onClick={() => setIsExtractionModalOpen(false)}
+                className={styles.closeButton}
+                title="Fechar"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className={styles.modalBody}>
+              <div className={styles.editForm}>
+                <div className={styles.formGroup}>
+                  <label>Cole o texto aqui (mínimo 50 caracteres):</label>
+                  <textarea
+                    value={extractionText}
+                    onChange={(e) => setExtractionText(e.target.value)}
+                    className={styles.editTextarea}
+                    rows={8}
+                    placeholder="Cole um texto longo de um artigo, livro, ou qualquer conteúdo. A IA irá extrair as frases mais relevantes e memoráveis..."
+                    disabled={isExtracting}
+                  />
+                  <div className={styles.textInfo}>
+                    {extractionText.length} caracteres
+                    {extractionText.length < 50 && (
+                      <span className={styles.warningText}> (mínimo 50 caracteres)</span>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleExtractPhrases}
+                  disabled={isExtracting || extractionText.length < 50}
+                  className={styles.extractButton}
+                >
+                  {isExtracting ? (
+                    <>
+                      <Loader2 size={18} className={styles.spinning} />
+                      Extraindo...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={18} />
+                      Extrair Frases
+                    </>
+                  )}
+                </button>
+
+                {extractedPhrases.length > 0 && (
+                  <div className={styles.extractedPhrasesContainer}>
+                    <h3 className={styles.extractedTitle}>
+                      {extractedPhrases.length} frase(s) encontrada(s)
+                    </h3>
+                    <div className={styles.extractedPhrasesList}>
+                      {extractedPhrases.map((extracted, index) => (
+                        <div
+                          key={index}
+                          className={`${styles.extractedPhraseCard} ${
+                            selectedExtractedPhrases.has(index) ? styles.selected : ''
+                          }`}
+                          onClick={() => toggleSelectExtractedPhrase(index)}
+                        >
+                          <div className={styles.extractedPhraseHeader}>
+                            <input
+                              type="checkbox"
+                              checked={selectedExtractedPhrases.has(index)}
+                              onChange={() => toggleSelectExtractedPhrase(index)}
+                              className={styles.checkbox}
+                            />
+                            <span className={styles.confidenceBadge}>
+                              {Math.round(extracted.confidence * 100)}% confiança
+                            </span>
+                          </div>
+                          <p className={styles.extractedPhraseText}>&quot;{extracted.phrase}&quot;</p>
+                          {extracted.author && (
+                            <p className={styles.extractedAuthor}>— {extracted.author}</p>
+                          )}
+                          {extracted.tags.length > 0 && (
+                            <div className={styles.extractedTags}>
+                              {extracted.tags.map((tag, tagIndex) => (
+                                <span key={tagIndex} className={styles.extractedTag}>
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {extracted.context && (
+                            <p className={styles.extractedContext}>{extracted.context}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className={styles.modalActions}>
+              {extractedPhrases.length > 0 && selectedExtractedPhrases.size > 0 && (
+                <button
+                  onClick={handleImportSelectedPhrases}
+                  className={styles.saveButton}
+                >
+                  Importar {selectedExtractedPhrases.size} frase(s) selecionada(s)
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setIsExtractionModalOpen(false)
+                  setExtractionText('')
+                  setExtractedPhrases([])
+                  setSelectedExtractedPhrases(new Set())
+                }}
+                className={styles.cancelButton}
+              >
+                {extractedPhrases.length > 0 ? 'Fechar' : 'Cancelar'}
               </button>
             </div>
           </div>

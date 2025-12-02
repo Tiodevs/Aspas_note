@@ -77,9 +77,10 @@ export default function EditDeckPage() {
     try {
       await decksAPI.removerFrase(cardId)
       loadData(pagination.page)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao remover frase:', error)
-      alert(error.message || 'Erro ao remover frase')
+      const err = error as { message?: string }
+      alert(err.message || 'Erro ao remover frase')
     }
   }
 
@@ -105,9 +106,10 @@ export default function EditDeckPage() {
       })
       setIsEditModalOpen(false)
       loadData(pagination.page)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao atualizar baralho:', error)
-      alert(error.message || 'Erro ao atualizar baralho')
+      const err = error as { message?: string }
+      alert(err.message || 'Erro ao atualizar baralho')
     } finally {
       setIsSaving(false)
     }
@@ -120,9 +122,10 @@ export default function EditDeckPage() {
     try {
       await decksAPI.deletar(deckId)
       router.push('/games/spaced-repetition')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao deletar baralho:', error)
-      alert(error.message || 'Erro ao deletar baralho')
+      const err = error as { message?: string }
+      alert(err.message || 'Erro ao deletar baralho')
       setIsDeleting(false)
     }
   }
@@ -352,7 +355,7 @@ export default function EditDeckPage() {
               <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <h2 className={styles.modalTitle}>Deletar Baralho</h2>
                 <p className={styles.deleteWarning}>
-                  Tem certeza que deseja deletar o baralho <strong>"{deck.name}"</strong>?
+                  Tem certeza que deseja deletar o baralho <strong>&quot;{deck.name}&quot;</strong>?
                   <br />
                   Esta ação não pode ser desfeita e todos os cartões serão removidos.
                 </p>

@@ -46,6 +46,9 @@ services:
     # Configuração para melhorar detecção de mudanças de arquivo no Docker
     environment:
       - CHOKIDAR_USEPOLLING=true
+      # Configurações do banco de dados para Docker (sobrescreve .env se necessário)
+      - DATABASE_URL=postgresql://admin:adminpassword@postgres:5432/aspas_note?schema=public
+      - MONGO_URI=mongodb://mongodb:27017/aspas_note
     depends_on:
       - postgres
       - mongodb
