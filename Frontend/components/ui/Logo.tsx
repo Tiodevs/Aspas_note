@@ -33,6 +33,7 @@ export const Logo: React.FC<LogoProps> = ({
       width={width}
       height={height}
       className={`${styles.logo} ${styles[size]} ${className || ''}`}
+      style={{ width: 'auto', height: 'auto' }}
       priority
     />
   )

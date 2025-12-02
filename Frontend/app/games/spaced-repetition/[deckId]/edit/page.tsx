@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { Navigation } from '@/components/ui'
 import { decksAPI, reviewsAPI, Deck, Card, ReviewStats } from '@/lib/api'
 import styles from './page.module.css'
-import { ArrowLeft, Search, Plus, X, Trash2 } from 'lucide-react'
+import { ArrowLeft, Search, Plus, X, Trash2, Edit2, Save } from 'lucide-react'
 import Link from 'next/link'
 
 export default function EditDeckPage() {
@@ -27,6 +27,14 @@ export default function EditDeckPage() {
     total: 0,
     pages: 0
   })
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    description: ''
+  })
+  const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -75,6 +83,50 @@ export default function EditDeckPage() {
     }
   }
 
+  const handleOpenEditModal = () => {
+    if (deck) {
+      setEditFormData({
+        name: deck.name,
+        description: deck.description || ''
+      })
+      setIsEditModalOpen(true)
+    }
+  }
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!deckId || !editFormData.name.trim()) return
+
+    setIsSaving(true)
+    try {
+      await decksAPI.atualizar(deckId, {
+        name: editFormData.name.trim(),
+        description: editFormData.description.trim() || undefined
+      })
+      setIsEditModalOpen(false)
+      loadData(pagination.page)
+    } catch (error: any) {
+      console.error('Erro ao atualizar baralho:', error)
+      alert(error.message || 'Erro ao atualizar baralho')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleDeleteDeck = async () => {
+    if (!deckId) return
+
+    setIsDeleting(true)
+    try {
+      await decksAPI.deletar(deckId)
+      router.push('/games/spaced-repetition')
+    } catch (error: any) {
+      console.error('Erro ao deletar baralho:', error)
+      alert(error.message || 'Erro ao deletar baralho')
+      setIsDeleting(false)
+    }
+  }
+
   const filteredCards = cards.filter(card =>
     card.phrase?.phrase.toLowerCase().includes(searchTerm.toLowerCase()) ||
     card.phrase?.author.toLowerCase().includes(searchTerm.toLowerCase())
@@ -117,10 +169,32 @@ export default function EditDeckPage() {
           </Link>
 
           <div className={styles.header}>
-            <h1 className={styles.title}>{deck.name}</h1>
-            {deck.description && (
-              <p className={styles.description}>{deck.description}</p>
-            )}
+            <div className={styles.headerContent}>
+              <div>
+                <h1 className={styles.title}>{deck.name}</h1>
+                {deck.description && (
+                  <p className={styles.description}>{deck.description}</p>
+                )}
+              </div>
+              <div className={styles.headerActions}>
+                <button
+                  onClick={handleOpenEditModal}
+                  className={styles.editDeckButton}
+                  title="Editar baralho"
+                >
+                  <Edit2 size={18} />
+                  Editar
+                </button>
+                <button
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className={styles.deleteDeckButton}
+                  title="Deletar baralho"
+                >
+                  <Trash2 size={18} />
+                  Deletar
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Estatísticas do Deck */}
@@ -220,6 +294,88 @@ export default function EditDeckPage() {
                 </div>
               )}
             </>
+          )}
+
+          {/* Modal de Editar Deck */}
+          {isEditModalOpen && (
+            <div className={styles.modalOverlay} onClick={() => setIsEditModalOpen(false)}>
+              <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                <h2 className={styles.modalTitle}>Editar Baralho</h2>
+                <form onSubmit={handleSaveEdit}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="editName">Nome do Baralho *</label>
+                    <input
+                      id="editName"
+                      type="text"
+                      value={editFormData.name}
+                      onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                      placeholder="Ex: Filosofia, Literatura..."
+                      required
+                      className={styles.formInput}
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="editDescription">Descrição (opcional)</label>
+                    <textarea
+                      id="editDescription"
+                      value={editFormData.description}
+                      onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                      placeholder="Descreva o baralho..."
+                      rows={3}
+                      className={styles.formTextarea}
+                    />
+                  </div>
+                  <div className={styles.modalActions}>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditModalOpen(false)}
+                      className={styles.cancelButton}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSaving || !editFormData.name.trim()}
+                      className={styles.submitButton}
+                    >
+                      {isSaving ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Modal de Deletar Deck */}
+          {isDeleteModalOpen && (
+            <div className={styles.modalOverlay} onClick={() => setIsDeleteModalOpen(false)}>
+              <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                <h2 className={styles.modalTitle}>Deletar Baralho</h2>
+                <p className={styles.deleteWarning}>
+                  Tem certeza que deseja deletar o baralho <strong>"{deck.name}"</strong>?
+                  <br />
+                  Esta ação não pode ser desfeita e todos os cartões serão removidos.
+                </p>
+                <div className={styles.modalActions}>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(false)}
+                    className={styles.cancelButton}
+                    disabled={isDeleting}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteDeck}
+                    disabled={isDeleting}
+                    className={styles.deleteButton}
+                  >
+                    {isDeleting ? 'Deletando...' : 'Deletar'}
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </main>

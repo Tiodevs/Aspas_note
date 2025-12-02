@@ -388,8 +388,15 @@ export const reviewsAPI = {
   obterFila: (deckId?: string, limit?: number): Promise<{ queue: ReviewQueueItem[]; count: number }> =>
     apiClient.get('/reviews/queue', { deckId, limit }),
   
-  processarRevisao: (cardId: string, grade: Grade): Promise<{ success: boolean; card: Card; changes: any }> =>
-    apiClient.post('/reviews', { cardId, grade }),
+  processarRevisao: async (cardId: string, grade: Grade): Promise<{ success: boolean; card: Card; changes: any }> => {
+    // Obter userId da sessão
+    const session = await getSession()
+    if (!session?.user?.id) {
+      throw new Error('Usuário não autenticado')
+    }
+    
+    return apiClient.post('/reviews', { cardId, grade, userId: session.user.id })
+  },
   
   obterEstatisticas: (deckId?: string): Promise<ReviewStats> =>
     apiClient.get('/reviews/stats', deckId ? { deckId } : undefined),
