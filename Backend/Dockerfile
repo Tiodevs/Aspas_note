@@ -1,4 +1,3 @@
-# Usar imagem oficial do Node.js
 FROM node:18-alpine
 
 # Instalar OpenSSL (necessário para o Prisma)
@@ -24,8 +23,11 @@ RUN npx prisma generate
 # Buildar o projeto TypeScript
 RUN npm run build
 
+# Tornar o script de start executável
+RUN chmod +x start.sh
+
 # Expor a porta que a aplicação roda
 EXPOSE 4000
 
-# Comando para iniciar a aplicação
-CMD ["npm", "start"]
+# Comando para iniciar a aplicação (roda migrações primeiro)
+CMD ["./start.sh"]
