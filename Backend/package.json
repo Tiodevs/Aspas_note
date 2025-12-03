@@ -31,7 +31,9 @@
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.36",
     "mongoose": "^9.0.0",
+    "pulumi": "^0.0.1",
     "resend": "^4.8.0",
+    "sst": "^3.17.24",
     "zod": "^4.0.5"
   },
   "devDependencies": {
