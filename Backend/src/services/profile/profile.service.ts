@@ -510,5 +510,75 @@ export class ProfileService {
             throw new Error('Erro ao buscar relatório mensal');
         }
     }
+
+    // Buscar perfis por nome ou username
+    async searchProfiles(searchTerm: string) {
+        try {
+            const profiles = await prisma.profile.findMany({
+                where: {
+                    OR: [
+                        {
+                            user: {
+                                name: {
+                                    contains: searchTerm,
+                                    mode: 'insensitive' as const
+                                }
+                            }
+                        },
+                        {
+                            user: {
+                                username: {
+                                    contains: searchTerm,
+                                    mode: 'insensitive' as const
+                                }
+                            }
+                        }
+                    ]
+                },
+                include: {
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            username: true,
+                            email: true,
+                            role: true,
+                            createdAt: true
+                        }
+                    },
+                    _count: {
+                        select: {
+                            followers: true,
+                            following: true
+                        }
+                    }
+                },
+                orderBy: {
+                    user: {
+                        username: 'asc'
+                    }
+                },
+                take: 50 // Limitar resultados para evitar sobrecarga
+            });
+
+            return profiles.map(profile => ({
+                id: profile.id,
+                avatar: profile.avatar,
+                bio: profile.bio,
+                createdAt: profile.createdAt,
+                updatedAt: profile.updatedAt,
+                userId: profile.userId,
+                user: profile.user,
+                followersCount: profile._count.followers,
+                followingCount: profile._count.following
+            }));
+        } catch (error) {
+            console.error('Erro ao buscar perfis:', error);
+            if (error instanceof Error) {
+                throw error;
+            }
+            throw new Error('Erro ao buscar perfis');
+        }
+    }
 }
 

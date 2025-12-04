@@ -63,10 +63,20 @@ export const followProfileSchema = z.object({
     .regex(CUID_REGEX, 'ID do usuário deve ser um CUID válido')
 });
 
+// Schema para query parameters de pesquisa de perfis
+export const searchProfilesQuerySchema = z.object({
+  q: z
+    .string()
+    .min(1, 'Termo de busca não pode estar vazio')
+    .max(100, 'Termo de busca deve ter no máximo 100 caracteres')
+    .trim()
+});
+
 // Tipos TypeScript derivados dos schemas
 export type CreateProfileInput = z.infer<typeof createProfileSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ProfileIdParamsInput = z.infer<typeof profileIdParamsSchema>;
 export type ProfileUserIdParamsInput = z.infer<typeof profileUserIdParamsSchema>;
 export type FollowProfileInput = z.infer<typeof followProfileSchema>;
+export type SearchProfilesQueryInput = z.infer<typeof searchProfilesQuerySchema>;
 
