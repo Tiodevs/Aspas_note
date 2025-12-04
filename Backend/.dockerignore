@@ -1,0 +1,60 @@
+# Dependências (serão instaladas dentro do container)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de build locais (será gerado dentro do container)
+dist/
+build/
+*.tsbuildinfo
+
+# Arquivos de log
+logs/
+*.log
+
+# Variáveis de ambiente (devem ser passadas via -e ou --env-file)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários
+*.tmp
+*.temp
+
+# Coverage e testes
+coverage/
+*.lcov
+src/__tests__/
+jest.config.js
+
+# Git
+.git/
+.gitignore
+
+# Documentação
+*.md
+DOCKER_BUILD.md
+README.md
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Uploads (se houver)
+uploads/
+

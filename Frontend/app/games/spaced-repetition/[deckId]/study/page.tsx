@@ -65,9 +65,10 @@ export default function StudyDeckPage() {
       } else {
         setCompleted(true)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao processar revisão:', error)
-      alert(error.message || 'Erro ao processar revisão')
+      const err = error as { message?: string }
+      alert(err.message || 'Erro ao processar revisão')
     } finally {
       setIsProcessing(false)
     }
