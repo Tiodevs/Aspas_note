@@ -121,10 +121,16 @@
   text-align: center;
   background: var(--color-background2);
   border: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
 .cardBack {
   transform: rotateY(180deg);
+  justify-content: flex-start;
+  padding-top: 1.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  gap: 0.5rem;
 }
 
 .phrase {
@@ -133,6 +139,9 @@
   margin-bottom: 1.5rem;
   color: var(--color-white);
   font-weight: 400;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
 }
 
 .author {
@@ -140,6 +149,9 @@
   color: var(--color-subtitle);
   margin-bottom: 1rem;
   font-style: italic;
+  width: 100%;
+  text-align: right;
+  padding-right: 1rem;
 }
 
 .hint {
@@ -153,7 +165,9 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .tag {
@@ -171,6 +185,8 @@
   gap: 1rem;
   width: 100%;
   max-width: 400px;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .gradeButtonAgain,
@@ -317,27 +333,79 @@
   }
 
   .card {
-    height: 350px;
+    height: auto;
+    min-height: 500px;
+    max-height: calc(100vh - 200px);
+  }
+
+  .cardContainer {
+    max-width: 100%;
   }
 
   .cardFront,
   .cardBack {
-    padding: 1.5rem;
+    padding: 1.25rem;
+    min-height: 500px;
+    max-height: calc(100vh - 200px);
+  }
+
+  .cardBack {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    justify-content: flex-start;
   }
 
   .phrase {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .author {
+    font-size: 0.95rem;
+    margin-bottom: 0.75rem;
+    padding-right: 0.5rem;
+  }
+
+  .tags {
+    margin-bottom: 1rem;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
   }
 
   .gradeButtons {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 0.6rem;
+    max-width: 100%;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .gradeButtonAgain,
+  .gradeButtonHard,
+  .gradeButtonGood,
+  .gradeButtonEasy {
+    padding: 0.85rem;
+    font-size: 0.95rem;
   }
 
   .header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+
+  .deckName {
+    font-size: 1.25rem;
+  }
+
+  .progress {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
   }
 
   .completedActions {
@@ -349,6 +417,47 @@
   .dashboardLink {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    min-height: 450px;
+    max-height: calc(100vh - 180px);
+  }
+
+  .cardFront,
+  .cardBack {
+    min-height: 450px;
+    max-height: calc(100vh - 180px);
+    padding: 1rem;
+  }
+
+  .phrase {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .author {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tags {
+    margin-bottom: 0.75rem;
+  }
+
+  .gradeButtons {
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .gradeButtonAgain,
+  .gradeButtonHard,
+  .gradeButtonGood,
+  .gradeButtonEasy {
+    padding: 0.75rem;
+    font-size: 0.9rem;
   }
 }
 
