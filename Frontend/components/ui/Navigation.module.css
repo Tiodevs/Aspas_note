@@ -173,7 +173,7 @@
 @media (max-width: 480px) {
   .nav {
     width: fit-content;
-    padding: 16px;
+    padding: 10px;
     bottom: 15px;
   }
 
@@ -182,9 +182,9 @@
   }
 
   .navIcon {
-    min-width: 60px;
-    min-height: 60px;
-    padding: 12px;
+    min-width: 55px;
+    min-height: 55px;
+    padding: 0px;
   }
 
   .navIcon svg {

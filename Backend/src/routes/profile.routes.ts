@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { ProfileController } from '../controllers/profile.controller';
-import { validate, validateParams } from '../middlewares/validation.middleware';
+import { validate, validateParams, validateQuery } from '../middlewares/validation.middleware';
 import { authenticateToken } from '../middlewares/auth.middleware';
-import { createProfileSchema, updateProfileSchema, profileIdParamsSchema, profileUserIdParamsSchema, followProfileSchema } from '../schemas/profile.schemas';
+import { createProfileSchema, updateProfileSchema, profileIdParamsSchema, profileUserIdParamsSchema, followProfileSchema, searchProfilesQuerySchema } from '../schemas/profile.schemas';
 
 const router = Router();
 const profileController = new ProfileController();
@@ -31,6 +31,9 @@ router.post('/unfollow', authenticateToken, validate(followProfileSchema), profi
 
 // Rotas públicas (podem ser acessadas sem autenticação para visualização)
 // IMPORTANTE: Rotas mais específicas devem vir antes das genéricas
+// Buscar perfis por nome ou username
+router.get('/search', validateQuery(searchProfilesQuerySchema), profileController.search);
+
 // Listar seguidores de um perfil
 router.get('/user/:userId/followers', validateParams(profileUserIdParamsSchema), profileController.getFollowers);
 

@@ -392,5 +392,26 @@ export class ProfileController {
             });
         }
     }
+
+    // Buscar perfis por nome ou username
+    search = async (req: Request, res: Response) => {
+        try {
+            const { q } = req.query as { q: string };
+
+            const profiles = await profileService.searchProfiles(q);
+
+            res.json({
+                profiles,
+                count: profiles.length
+            });
+        } catch (error: any) {
+            console.error('Erro ao buscar perfis:', error);
+            
+            res.status(500).json({
+                error: 'Erro interno do servidor',
+                code: 'INTERNAL_ERROR'
+            });
+        }
+    }
 }
 
