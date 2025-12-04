@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Instalar OpenSSL (necessário para o Prisma)
 RUN apk add --no-cache openssl
@@ -23,11 +23,9 @@ RUN npx prisma generate
 # Buildar o projeto TypeScript
 RUN npm run build
 
-# Tornar o script de start executável
-RUN chmod +x start.sh
-
 # Expor a porta que a aplicação roda
 EXPOSE 4000
 
 # Comando para iniciar a aplicação (roda migrações primeiro)
-CMD ["./start.sh"]
+# Usamos sh -c para evitar problemas com quebras de linha do Windows
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
