@@ -153,13 +153,12 @@ export class PhrasesService {
     }
 
     // Buscar todos os autores únicos
-    async getUniqueAuthors(userIdAuth?: string): Promise<string[]> {
+    async getUniqueAuthors(userIdAuth: string): Promise<string[]> {
         // Verificar se userIdAuth foi fornecido
         if (!userIdAuth) {
             throw new Error('Usuário não autenticado');
         }
 
-        // Verificar se o usuário é admin
         const user = await prisma.user.findUnique({
             where: { id: userIdAuth }
         });
@@ -168,18 +167,14 @@ export class PhrasesService {
             throw new Error('Usuário não encontrado');
         }
 
-        const result = await prisma.phrase.findMany({
+        const authors = await prisma.phrase.findMany({
             where: {
                 userId: userIdAuth
             },
-            select: {
-                author: true
-            }
+            select: { author: true }
         });
 
-        // Extrair autores únicos
-        const uniqueAuthors = [...new Set(result.map(item => item.author))].filter(author => author && author.trim() !== '');
-        return uniqueAuthors;
+        return [...new Set(authors.map(item => item.author))].filter(author => author && author.trim() !== '');
     }
 
     // Buscar todas as tags únicas

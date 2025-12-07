@@ -111,7 +111,7 @@ export default function DashboardPage() {
     try {
       // Carregar todas as opções de filtro, decks e frases em paralelo
       const [authors, tags, decksResponse] = await Promise.all([
-        frasesAPI.buscarAutoresUnicos(session.user.id),
+        frasesAPI.buscarAutoresUnicos(),
         frasesAPI.buscarTagsUnicas(session.user.id),
         decksAPI.listar({ userId: session.user.id })
       ])
