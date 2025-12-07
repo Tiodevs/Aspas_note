@@ -153,37 +153,25 @@ export class PhrasesService {
     }
 
     // Buscar todos os autores únicos
-    async getUniqueAuthors(userId?: string, userIdAuth?: string): Promise<string[]> {
+    async getUniqueAuthors(userIdAuth?: string): Promise<string[]> {
         // Verificar se userIdAuth foi fornecido
         if (!userIdAuth) {
             throw new Error('Usuário não autenticado');
         }
 
-        // Se userId foi fornecido, fazer validação de autorização
-        if (userId) {
-            // Verificar se o usuário é admin ou o userId é o mesmo passado no filtro
-            const user = await prisma.user.findUnique({
-                where: { id: userIdAuth }
-            });
+        // Verificar se o usuário é admin
+        const user = await prisma.user.findUnique({
+            where: { id: userIdAuth }
+        });
 
-            if (!user) {
-                throw new Error('Usuário não encontrado');
-            }
-
-            if (user.role !== 'ADMIN' && userId !== userIdAuth) {
-                throw new Error('Usuário não autorizado');
-            }
-        }
-
-        const where: any = {};
-
-        // Filtrar por usuário se especificado
-        if (userId) {
-            where.userId = userId;
+        if (!user) {
+            throw new Error('Usuário não encontrado');
         }
 
         const result = await prisma.phrase.findMany({
-            where,
+            where: {
+                userId: userIdAuth
+            },
             select: {
                 author: true
             }

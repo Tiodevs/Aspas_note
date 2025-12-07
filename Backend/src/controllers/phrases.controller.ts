@@ -162,11 +162,9 @@ export class PhrasesController {
     // Listar autores únicos
     getUniqueAuthors = async (req: Request, res: Response) => {
         try {
-            const { userId } = req.query;
             const userIdAuth = (req as any).user?.userId;
 
             const authors = await phrasesService.getUniqueAuthors(
-                userId as string,
                 userIdAuth
             );
             res.status(200).json(authors);

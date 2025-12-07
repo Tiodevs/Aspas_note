@@ -1,5 +1,4 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { envs } from "../../config/env";
 
 export interface ExtractedPhrase {
