@@ -76,7 +76,7 @@ export default function DashboardPage() {
   const [selectedExtractedPhrases, setSelectedExtractedPhrases] = useState<Set<number>>(new Set())
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'unauthenticated' || !session) {
       router.push('/login')
     }
   }, [status, router])
@@ -116,8 +116,9 @@ export default function DashboardPage() {
         decksAPI.listar({ userId: session.user.id })
       ])
       
-      setUniqueAuthors(authors)
-      setUniqueTags(tags)
+      // Garantir que authors seja um array válido
+      setUniqueAuthors(Array.isArray(authors) ? authors : [])
+      setUniqueTags(Array.isArray(tags) ? tags : [])
       setAvailableDecks(decksResponse.decks)
       
       // Carregar frases iniciais com userId da sessão
@@ -199,16 +200,22 @@ export default function DashboardPage() {
 
   // Função para recarregar filtros únicos
   const loadUniqueFilters = async () => {
+    if (status !== 'authenticated' || !session?.user?.id) return
+    
     try {
       const [authors, tags] = await Promise.all([
         frasesAPI.buscarAutoresUnicos(),
-        frasesAPI.buscarTagsUnicas()
+        frasesAPI.buscarTagsUnicas(session.user.id)
       ])
       
-      setUniqueAuthors(authors)
-      setUniqueTags(tags)
+      // Garantir que authors seja um array válido
+      setUniqueAuthors(Array.isArray(authors) ? authors : [])
+      setUniqueTags(Array.isArray(tags) ? tags : [])
     } catch (error) {
       console.error('Erro ao carregar filtros únicos:', error)
+      // Em caso de erro, manter os valores atuais ou definir arrays vazios
+      setUniqueAuthors([])
+      setUniqueTags([])
     }
   }
 
@@ -396,15 +403,28 @@ export default function DashboardPage() {
   const handleAuthorChange = (value: string) => {
     setCreateFormData({...createFormData, author: value})
     
+    // Verificar se uniqueAuthors está disponível
+    if (!uniqueAuthors || uniqueAuthors.length === 0) {
+      setAuthorSuggestions([])
+      setShowAuthorSuggestions(false)
+      return
+    }
+    
     let suggestions: string[]
     
     if (value.trim()) {
-      suggestions = uniqueAuthors.filter(author => 
-        author.toLowerCase().includes(value.toLowerCase())
-      ).slice(0, 20) // Limitar a 20 sugestões
+      // Filtrar autores que contêm o texto digitado (case-insensitive)
+      suggestions = uniqueAuthors
+        .filter(author => author && author.trim() !== '')
+        .filter(author => 
+          author.toLowerCase().includes(value.toLowerCase())
+        )
+        .slice(0, 20) // Limitar a 20 sugestões
     } else {
       // Se o campo estiver vazio, mostrar todos os autores como sugestões (limitado a 20)
-      suggestions = uniqueAuthors.slice(0, 20)
+      suggestions = uniqueAuthors
+        .filter(author => author && author.trim() !== '')
+        .slice(0, 20)
     }
     
     setAuthorSuggestions(suggestions)
@@ -647,6 +667,11 @@ export default function DashboardPage() {
     setCreateTagInput('')
     setCreateDeckInput('')
     setIsCreateModalOpen(true)
+    
+    // Garantir que os autores estejam carregados quando o modal abrir
+    if (uniqueAuthors.length === 0 && status === 'authenticated') {
+      loadUniqueFilters()
+    }
   }
 
   const closeCreateModal = () => {
@@ -892,10 +917,6 @@ export default function DashboardPage() {
         <div className={styles.globalLoadingSpinner}></div>
       </div>
     )
-  }
-
-  if (!session) {
-    return null
   }
 
   return (
@@ -1250,15 +1271,27 @@ export default function DashboardPage() {
                       value={createFormData.author}
                       onChange={(e) => handleAuthorChange(e.target.value)}
                       onFocus={() => {
+                        // Verificar se uniqueAuthors está disponível
+                        if (!uniqueAuthors || uniqueAuthors.length === 0) {
+                          setAuthorSuggestions([])
+                          setShowAuthorSuggestions(false)
+                          return
+                        }
+                        
                         if (createFormData.author.trim()) {
-                          const filtered = uniqueAuthors.filter(author => 
-                            author.toLowerCase().includes(createFormData.author.toLowerCase())
-                          ).slice(0, 20)
+                          const filtered = uniqueAuthors
+                            .filter(author => author && author.trim() !== '')
+                            .filter(author => 
+                              author.toLowerCase().includes(createFormData.author.toLowerCase())
+                            )
+                            .slice(0, 20)
                           setAuthorSuggestions(filtered)
                           setShowAuthorSuggestions(filtered.length > 0)
                         } else {
                           // Se o campo estiver vazio, mostrar todos os autores (limitado a 20)
-                          const suggestions = uniqueAuthors.slice(0, 20)
+                          const suggestions = uniqueAuthors
+                            .filter(author => author && author.trim() !== '')
+                            .slice(0, 20)
                           setAuthorSuggestions(suggestions)
                           setShowAuthorSuggestions(suggestions.length > 0)
                         }
