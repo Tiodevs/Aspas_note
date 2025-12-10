@@ -17,10 +17,7 @@ export class DecksController {
         });
       }
 
-      // Garantir que o userId do body seja o mesmo do usuário autenticado
-      data.userId = userIdAuth;
-
-      const deck = await decksService.createDeck(data);
+      const deck = await decksService.createDeck(data, userIdAuth);
       res.status(201).json(deck);
     } catch (error: any) {
       console.error('Erro ao criar baralho:', error);
