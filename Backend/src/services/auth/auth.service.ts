@@ -90,7 +90,7 @@ export class AuthService {
     }
 
     // Criar um novo usuário
-    async createUser(username: string, email: string, password: string, role: Role) {
+    async createUser(username: string, email: string, password: string) {
         try {
             // Verifica se já existe usuário com este email
             const usuarioExistente = await prisma.user.findFirst({
@@ -120,7 +120,7 @@ export class AuthService {
                     username: username,
                     email,
                     password: hashedPassword,
-                    role: role
+                    role: Role.FREE
                 }
             });
 

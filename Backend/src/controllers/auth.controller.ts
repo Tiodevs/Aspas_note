@@ -40,10 +40,10 @@ export class AuthController {
 
     // Criar um novo usuário (registro)
     register = async (req: Request, res: Response) => {
-        const { nome, email, senha, role }: RegisterInput = req.body;
+        const { nome, email, senha }: RegisterInput = req.body;
 
         try {
-            const usuario = await authService.createUser(nome, email, senha, role);
+            const usuario = await authService.createUser(nome, email, senha);
             res.status(201).json({
                 message: 'Usuário criado com sucesso',
                 user: usuario

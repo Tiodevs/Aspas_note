@@ -5,7 +5,17 @@ import Log from '../../models/Log';
 
 export class PhrasesService {
 
-    async createPhrase(phrase: string, author: string, tags: string[], userId: string): Promise<PhraseResponse> {
+    async createPhrase(phrase: string, author: string, tags: string[], userIdAuth: string): Promise<PhraseResponse> {
+        const userId = userIdAuth;
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId }
+        });
+
+        if (!user) {
+            throw new Error('Usuário não encontrado');
+        }
+
         const newPhrase = await prisma.phrase.create({
             data: {
                 phrase,
@@ -119,26 +129,22 @@ export class PhrasesService {
         };
     }
 
-    async listPhrasesByUser(userId: string): Promise<PhraseResponse[]> {
-        const phrases = await prisma.phrase.findMany({
-            where: {
-                userId
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-        return phrases;
-    }
+    async updatePhrase(id: string, updateData: UpdatePhraseInput, userIdAuth: string): Promise<PhraseResponse> {
 
-    async getPhraseById(id: string): Promise<PhraseResponse | null> {
+        const userId = userIdAuth;
+
         const phrase = await prisma.phrase.findUnique({
-            where: { id },
+            where: { id }
         });
-        return phrase;
-    }
 
-    async updatePhrase(id: string, updateData: UpdatePhraseInput): Promise<PhraseResponse> {
+        if (!phrase) {
+            throw new Error('Frase não encontrada');
+        }
+
+        if (phrase.userId !== userId) {
+            throw new Error('Usuário não autorizado');
+        }
+
         const updatedPhrase = await prisma.phrase.update({
             where: { id },
             data: updateData
@@ -146,76 +152,60 @@ export class PhrasesService {
         return updatedPhrase;
     }
 
-    async deletePhrase(id: string): Promise<void> {
+    async deletePhrase(id: string, userIdAuth: string): Promise<void> {
+
+        const userId = userIdAuth;
+
+        const phrase = await prisma.phrase.findUnique({
+            where: { id }
+        });
+
+        if (!phrase) {
+            throw new Error('Frase não encontrada');
+        }
+
+        if (phrase.userId !== userId) {
+            throw new Error('Usuário não autorizado');
+        }
+
         await prisma.phrase.delete({
             where: { id }
         });
     }
 
     // Buscar todos os autores únicos
-    async getUniqueAuthors(userId?: string, userIdAuth?: string): Promise<string[]> {
+    async getUniqueAuthors(userIdAuth: string): Promise<string[]> {
         // Verificar se userIdAuth foi fornecido
         if (!userIdAuth) {
             throw new Error('Usuário não autenticado');
         }
 
-        // Se userId foi fornecido, fazer validação de autorização
-        if (userId) {
-            // Verificar se o usuário é admin ou o userId é o mesmo passado no filtro
-            const user = await prisma.user.findUnique({
-                where: { id: userIdAuth }
-            });
-
-            if (!user) {
-                throw new Error('Usuário não encontrado');
-            }
-
-            if (user.role !== 'ADMIN' && userId !== userIdAuth) {
-                throw new Error('Usuário não autorizado');
-            }
-        }
-
-        const where: any = {};
-
-        // Filtrar por usuário se especificado
-        if (userId) {
-            where.userId = userId;
-        }
-
-        const result = await prisma.phrase.findMany({
-            where,
-            select: {
-                author: true
-            }
+        const user = await prisma.user.findUnique({
+            where: { id: userIdAuth }
         });
 
-        // Extrair autores únicos
-        const uniqueAuthors = [...new Set(result.map(item => item.author))].filter(author => author && author.trim() !== '');
-        return uniqueAuthors;
+        if (!user) {
+            throw new Error('Usuário não encontrado');
+        }
+
+        const authors = await prisma.phrase.findMany({
+            where: {
+                userId: userIdAuth
+            },
+            select: { author: true }
+        });
+
+        return [...new Set(authors.map(item => item.author))].filter(author => author && author.trim() !== '');
     }
 
     // Buscar todas as tags únicas
-    async getUniqueTags(userId?: string, userIdAuth?: string): Promise<string[]> {
-        // Verificar se userIdAuth foi fornecido
+    async getUniqueTags(userIdAuth?: string): Promise<string[]> {
+        
         if (!userIdAuth) {
             throw new Error('Usuário não autenticado');
         }
 
-        // Se userId foi fornecido, fazer validação de autorização
-        if (userId) {
-            // Verificar se o usuário é admin ou o userId é o mesmo passado no filtro
-            const user = await prisma.user.findUnique({
-                where: { id: userIdAuth }
-            });
-
-            if (!user) {
-                throw new Error('Usuário não encontrado');
-            }
-
-            if (user.role !== 'ADMIN' && userId !== userIdAuth) {
-                throw new Error('Usuário não autorizado');
-            }
-        }
+        const userId = userIdAuth;
 
         const where: any = {};
 
@@ -344,5 +334,24 @@ export class PhrasesService {
             }
             throw new Error('Erro ao buscar frases do feed');
         }
+    }
+
+    async listPhrasesByUser(userId: string): Promise<PhraseResponse[]> {
+        const phrases = await prisma.phrase.findMany({
+            where: {
+                userId
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+        return phrases;
+    }
+
+    async getPhraseById(id: string): Promise<PhraseResponse | null> {
+        const phrase = await prisma.phrase.findUnique({
+            where: { id },
+        });
+        return phrase;
     }
 }
