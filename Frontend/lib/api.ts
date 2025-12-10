@@ -182,8 +182,8 @@ export const frasesAPI = {
   deletar: (id: string) => apiClient.delete(`/phrases/${id}`),
   listarPorUsuario: (userId: string) => apiClient.get(`/phrases/user/${userId}`),
   // Novos endpoints otimizados para filtros
-  buscarAutoresUnicos: (userId?: string): Promise<string[]> => 
-    apiClient.get('/phrases/filters/authors', userId ? { userId } : undefined),
+  buscarAutoresUnicos: (): Promise<string[]> => 
+    apiClient.get('/phrases/filters/authors'),
   buscarTagsUnicas: (userId?: string): Promise<string[]> => 
     apiClient.get('/phrases/filters/tags', userId ? { userId } : undefined),
   // Feed de frases

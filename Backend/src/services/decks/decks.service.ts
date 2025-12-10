@@ -6,8 +6,10 @@ export class DecksService {
   /**
    * Cria um novo baralho (deck)
    */
-  async createDeck(data: CreateDeckInput) {
-    const { name, description, userId } = data;
+  async createDeck(data: CreateDeckInput, userIdAuth: string) {
+    const { name, description } = data;
+
+    const userId = userIdAuth;
 
     // Verificar se o usuário existe
     const user = await prisma.user.findUnique({
